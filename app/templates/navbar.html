@@ -1,0 +1,34 @@
+{% load static %}
+
+<ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+    {% if user_is_authenticated %}
+        {% if opt == "msg" %}
+            <li><a href="#" class="nav-link nav-link-active"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">Conversas</a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">Grupos</a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">Notificações</a></li>
+        {% elif opt == "group" %}
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">Conversas</a></li>
+            <li><a href="#" class="nav-link nav-link-active"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">Grupos</a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">Notificações</a></li>
+        {% elif opt == "notification" %}
+        <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">Conversas</a></li>
+        <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">Grupos</a></li>
+        <li><a href="#" class="nav-link nav-link-active"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">Notificações</a></li>
+        {% else %}
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">Conversas</a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">Grupos</a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">Notificações</a></li>
+        {% endif %}
+    {% endif %}
+</ul>
+<div id="telezap-auth-btns" class="col-md-3 text-end">
+    {% if user_is_authenticated %}
+        {% if slug %}
+            <a href="{% url 'user:profile' slug %}"><button type="button" class="btn btn-outline-primary me-2">Perfil</button></a>
+        {% endif %}
+        <a href="{% url 'logout' %}"><button type="button" class="btn btn-danger">Sair</button></a>
+    {% else %}
+        <a href="{% url 'login' %}"><button type="button" class="btn btn-outline-primary me-2">Login</button></a>
+        <a href="{% url 'signup' %}"><button type="button" class="btn btn-primary">Criar conta</button></a>
+    {% endif %}
+</div>

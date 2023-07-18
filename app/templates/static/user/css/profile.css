@@ -1,0 +1,124 @@
+#emoji-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: space-around;
+    align-items: center;
+    max-height: 200px;
+    overflow-y: scroll;
+    font-size: 30px;
+    padding-top: 30px;
+    padding-right: 15px;
+}
+
+#emoji-list span {
+    padding: 5px;
+}
+
+#emoji-list span:hover {
+    cursor: pointer;
+    background-color: rgba(var(--bs-body-color-rgb),.65);
+}
+
+#photo-label {
+	display: block!important;
+	width: 50vw!important;
+	max-width: 250px!important;
+	margin: 0 auto!important;
+	border-radius: 10px!important;
+	font-size: 1em!important;
+	line-height: 2em!important;
+	text-align: center!important;
+    margin-top: 10px!important;
+}
+
+.photo-preview-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+
+#photo-checkbox {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+}
+
+#photo-label:hover {
+	background-color: cornflowerblue;
+}
+
+#photo-label:active {
+	background-color: mediumaquamarine;
+}
+
+input[type="file"] {
+	border: 0;
+    clip: rect(1px, 1px, 1px, 1px);
+    height: 1px; 
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.photo-field {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#profile-photo {
+    overflow: hidden;
+    border-radius: 50%;
+    width: 50%;
+    height: 50%;
+}
+
+.form-field {
+    margin-bottom: 0.75rem;
+}
+
+textarea {
+    resize: none;
+    background-color: rgba(0, 0, 0, 0);
+    padding-top: 20px!important;
+}
+
+#status-label {
+    top: 0px!important;
+    padding: 0.75rem;
+    color: rgba(var(--bs-body-color-rgb),.65);
+    transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+#change-password label {
+    left: 0px!important;
+}
+
+@media (max-width: 768px) {
+    #profile-photo {
+        overflow: hidden;
+        border-radius: 50%;
+        width: 300px;
+        height: 300px;
+    }
+
+    h4 {
+        font-size: medium!important;
+    }
+}
+

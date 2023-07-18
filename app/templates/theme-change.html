@@ -1,0 +1,35 @@
+{% load static %}
+
+<div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle" style="z-index: 100;">
+    <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center btn-theme-change-container" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (dark)">
+      <img id="active-theme" src="{% static 'base/img/auto-theme.svg' %}" width="20" height="20" alt="auto">
+      <svg class="bi my-1 theme-icon-active" width="1em" height="1em"><use href="{% static 'base/img/auto-theme.png' %}"></use></svg>
+      <span class="visually-hidden" id="bd-theme-text">Mudar tema</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+      <li>
+        <button type="button" class="dropdown-item theme-change-btn" data-bs-theme-value="light" data-url="{% static 'base/img/light-theme.svg' %}" aria-pressed="false">
+          <img src="{% static 'base/img/light-theme.svg' %}" width="20" height="20" alt="light">
+          <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em"><use href="{% static 'base/img/light-theme.png' %}l"></use></svg>
+          Claro
+          <svg class="bi ms-auto d-none" width="1em" height="1em"><use href=""></use></svg>
+        </button>
+      </li>
+      <li>
+        <button type="button" class="dropdown-item theme-change-btn" data-bs-theme-value="dark" data-url="{% static 'base/img/dark-theme.svg' %}" aria-pressed="true">
+          <img src="{% static 'base/img/dark-theme.svg' %}" width="20" height="20" alt="dark">
+          <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em"><use href="{% static 'base/img/dark-theme.png' %}"></use></svg>
+          Escuro
+          <svg class="bi ms-auto d-none" width="1em" height="1em"><use href=""></use></svg>
+        </button>
+      </li>
+      <li>
+        <button type="button" class="dropdown-item theme-change-btn active" data-bs-theme-value="auto" data-url="{% static 'base/img/auto-theme.svg' %}" aria-pressed="false">
+          <img src="{% static 'base/img/auto-theme.svg' %}" width="20" height="20" alt="auto">
+          <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em"><use href="{% static 'base/img/auto-theme.png' %}"></use></svg>
+          Auto
+          <svg class="bi ms-auto d-none" width="1em" height="1em"><use href=""></use></svg>
+        </button>
+      </li>
+    </ul>
+</div>

@@ -1,0 +1,105 @@
+
+html, body {
+  height: 100%;
+}
+
+.errorlist {
+  color: rgba(255, 0, 0, 0.541);
+}
+
+.theme-change-btn {
+  display: flex!important;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.btn-theme-change-container {
+  border: 1px solid var(--bs-light-text-emphasis);
+}
+
+.theme-change-icon {
+  filter: hue-rotate(200deg);
+}
+
+.emoji-icon {
+  font-size: 1.5em;
+  padding: 5px;
+}
+
+.emoji-icon:hover {
+  cursor: pointer;
+  background-color: rgba(var(--bs-body-color-rgb),.65);
+}
+
+.tab-content {
+  font-size: 25px;
+  overflow-y: scroll;
+  max-height: 250px;
+  overflow-x: hidden;
+}
+
+/* desktop */
+
+.nav-link-active {
+  color: RGBA(var(--bs-secondary-rgb),1)!important;
+  -webkit-text-decoration-color: RGBA(var(--bs-secondary-rgb),1)!important;
+  text-decoration-color: RGBA(var(--bs-secondary-rgb),1)!important;
+  text-decoration: underline!important;
+}
+
+.nav-link-active:hover {
+  cursor:default;
+}
+
+.nav-link:hover {
+  text-decoration: underline!important;
+}
+
+.nav-bar-icon {
+  margin-right: 6px!important;
+}
+
+.emoji-nav-link:hover {
+  text-decoration: none!important;
+}
+
+#telezap-logo {
+  width: 50;
+  height: 50;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+#telezap-auth-btns {
+  margin-right: 10px;
+}
+
+
+/* mobile */
+@media (max-width: 768px) {
+  #telezap-logo {
+    width: 40;
+    height: 40;
+    margin-right: 10px;
+  }
+
+  #telezap-auth-btns {
+    margin-right: 0px;
+  }
+
+  .nav {
+    font-size: x-small!important;
+    display: flex!important;
+    flex-direction: row!important;
+    align-items: center!important;
+    flex-wrap: nowrap!important;
+  }
+
+  .emoji-list {
+    text-align: center;
+    padding-right: 5px;
+  }
+}

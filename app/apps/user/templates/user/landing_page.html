@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Telezap{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'user/css/landing_page.css' %}">
+{% endblock head %}
+
+{% block navbar %}
+    {% include 'navbar.html' with user_is_authenticated=request.user.is_authenticated opt=None slug=request.user.slug %}
+{% endblock navbar %}
+
+{% block body %}
+    <div class="container">
+        <img id="telezap-logo" src="{% static 'base/img/icon.svg' %}" width="100" height="100" alt="telezap-logo">
+        <h1>Telezap</h1>
+        <br>
+        <p>Uma plataforma web feita em Django de mensagens multimídia que possui recursos de login, envio de mensagens entre usuários, criação de grupos de usuários, envio de imagens e chamadas de áudio e vídeo.</p>
+    </div>
+{% endblock body %}
