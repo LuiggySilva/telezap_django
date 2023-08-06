@@ -5,6 +5,7 @@ app_name = 'user'
 
 urlpatterns = [
     path('', views.LandingPageView.as_view(), name='landing_page'),
+    path('remover_amigo/', views.remove_friend, name='remove_friend'),
     path('perfil/<slug:slug>/', views.UserProfileView.as_view(), name="profile"),
     path('perfil/<slug:slug>/atualizar-perfil', views.profile_update, name="profile_update"),
     path('perfil/<slug:slug>/atualizar-senha', views.profile_password_update, name="profile_password_update"),

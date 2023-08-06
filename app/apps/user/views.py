@@ -16,6 +16,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.template.loader import render_to_string
+from django.shortcuts import get_object_or_404
+
 
 from .models import User
 from .forms import (
@@ -24,45 +26,46 @@ from .forms import (
     UserProfileConfigForm
 )
 from apps.util import get_all_emojis
+from apps.notification.models import FriendshipRequest, GroupRequest
 
 
 class LandingPageView(TemplateView):
-    """
-    View para renderizar a página inicial do site.
+    '''
+    View to render the site's landing page.
 
-    Herda da classe TemplateView que é usada para renderizar um template
-    sem qualquer processamento adicional de dados.
+    Inherits from the TemplateView class which is used to render a template
+    without any additional data processing.
 
     Attributes:
-        template_name (str): O nome do template a ser usado para renderizar a página.
+        template_name (str): The name of the template to be used to render the page.
 
     Notes:
-        Essa view não requer nenhum dado adicional para ser exibida, pois apenas
-        renderiza o template da página inicial do site.
-    """
+        This view does not require any additional data to be displayed, as it only
+        renders the site's landing page template.
+    '''
 
     template_name = 'user/landing_page.html'
 
 
 class SignupView(CreateView):
-    """
-    View para o formulário de inscrição de novos usuários.
+    '''
+    View for the new user signup form.
 
-    Herda da classe CreateView que é usada para renderizar um formulário
-    de criação de objetos e salvar novos objetos no banco de dados.
+    Inherits from the CreateView class which is used to render a form
+    for creating objects and saving new objects to the database.
 
     Attributes:
-        template_name (str): O nome do template a ser usado para renderizar a página.
-        form_class (Form): A classe do formulário a ser usado para criar novos usuários.
+        template_name (str): The name of the template to be used to render the page.
+        form_class (Form): The form class to be used for creating new users.
 
     Methods:
-        get_success_url: Sobrescreve o método para redirecionar para a página de login
-            após o cadastro bem-sucedido.
+        get_success_url: Overrides the method to redirect to the login page
+            after successful signup.
 
     Notes:
-        Para o cadastro de novos usuários, o formulário de criação é fornecido
-        pela classe CustomUserCreationForm, que foi definida em forms.py.
-    """
+        For the signup of new users, the creation form is provided
+        by the CustomUserCreationForm class, which was defined in forms.py.
+    '''
 
     template_name = "registration/signup.html"
     form_class = CustomUserCreationForm
@@ -72,23 +75,26 @@ class SignupView(CreateView):
 
 
 class UserProfileView(LoginRequiredMixin, DetailView):
-    """
-    View para exibir o perfil do usuário logado.
+    '''
+    View to display the logged in user's profile.
 
-    Herda da classe DetailView que é usada para exibir detalhes de um objeto,
-    neste caso, o objeto User.
+    Inherits from the DetailView class which is used to display details of an object,
+    in this case, the User object.
 
     Attributes:
-        template_name (str): O nome do template a ser usado para renderizar a view.
-        queryset (QuerySet): O conjunto de objetos a partir do qual os detalhes
-            são exibidos. Neste caso, todos os usuários são incluídos.
-        context_object_name (str): O nome da variável de contexto que contém o
-            objeto User que será usado no template.
+        template_name (str): The name of the template to be used to render the page.
+        queryset (QuerySet): The set of objects from which the details are displayed.
+            In this case, all users are included.
+        context_object_name (str): The name of the context variable that contains the
+            User object that will be used in the template.
 
     Methods:
-        get_context_data: Sobrescreve o método para adicionar contextos adicionais
-            além do objeto User ao template, como formulários de edição e emojis.
-    """
+        get_context_data: Overrides the method to add additional contexts in addition
+            to the User object to the template, such as editing forms and emojis.
+
+    Notes:
+        This view is only accessible to authenticated users.
+    '''
 
     template_name = "user/profile.html"
     queryset = User.objects.all()
@@ -108,6 +114,16 @@ class UserProfileView(LoginRequiredMixin, DetailView):
         Returns:
             dict: Dicionário contendo os contextos adicionais.
         """
+        '''
+        Adds additional contexts to the template.
+
+        This method is called to get the context dictionary that will be passed
+        to the template. Here, we are adding the following additional contexts:
+        - form_user_profile: A form for editing the user's profile.
+        - form_user_profile_config: A form for editing the user's profile settings.
+        - form_user_profile_password: A form for changing the user's password.
+        - emojis: A dictionary containing emojis grouped by category. 
+        '''
 
         context = super(UserProfileView, self).get_context_data(*args, **kwargs)
 
@@ -115,10 +131,10 @@ class UserProfileView(LoginRequiredMixin, DetailView):
 
         context.update(
             {
-                'form_perfil': UserProfileForm(instance=self.get_object()),
-                'form_config_perfil': UserProfileConfigForm(instance=self.get_object()),
-                'form_senha_perfil': PasswordChangeForm(user=self.get_object()),
-                'emojis_categories': emojis_categories
+                'form_user_profile': UserProfileForm(instance=self.get_object()),
+                'form_user_profile_config': UserProfileConfigForm(instance=self.get_object()),
+                'form_user_profile_password': PasswordChangeForm(user=self.get_object()),
+                'emojis': emojis_categories
             }
         )
         return context
@@ -126,34 +142,35 @@ class UserProfileView(LoginRequiredMixin, DetailView):
 
 @login_required
 def profile_update(request, slug):
-    """
-    View para atualização do perfil do usuário.
-
-    Essa view é acessível apenas para usuários autenticados.
+    '''
+    View for updating the user's profile.
 
     Args:
-        request (HttpRequest): O objeto HttpRequest contendo os dados da requisição.
-        slug (str): O slug do usuário cuja senha será atualizada.
+        request (HttpRequest): The HttpRequest object containing the request data.
+        slug (str): The slug of the user whose password will be updated.
 
     Returns:
-        HttpResponseRedirect: Redireciona para a página do perfil do usuário após a atualização do seu perfil.
-    """
+        HttpResponseRedirect: Redirects to the user's profile page after updating their profile.
+
+    Notes:
+        This view is only accessible to authenticated users.
+    '''
 
     if request.method == "POST":
-        # Obtém o usuário autenticado com base no slug do usuário da requisição
+        # Get the authenticated user based on the request user's slug
         slug = request.user.slug
         user = User.objects.get(slug=slug)
         user_id = user.pk
-        # Cria o formulário de alteração do perfil do usuário e os dados enviados pelo formulário POST
+        # Creates the user profile change form and the data sent by the POST form
         form = UserProfileForm(request.POST, request.FILES, instance=user)
-        # Caso o formulário seja válido salva as alterações do perfil no banco de dados
+        # If the form is valid, save the profile changes to the database
         if (form.is_valid()):
             form.save()
             user = User.objects.get(pk=user_id)
-            # Adiciona uma mensagem de sucesso para ser exibida na próxima página
+            # Add a success message to be displayed on the next page
             messages.add_message(request, constants.SUCCESS, 'Perfil atualizado com sucesso!')
         else:
-            # Se o formulário não for válido, exibe uma mensagem de erro para cada erro encontrado
+            # If the form is not valid, display an error message for each error found
             messages.add_message(request, constants.ERROR,'Erro na alteração do perfil!')
             for field_name, errors in form.errors.items():
                 for error in errors:
@@ -161,86 +178,125 @@ def profile_update(request, slug):
                         messages.add_message(request, constants.ERROR, f'Status: {error}')
                     else:
                         messages.add_message(request, constants.ERROR, f'{error}')
-        # Redireciona para a página do perfil do usuário após a atualização do seu perfil
+        # Redirects to the user's profile page after updating their profile
         return HttpResponseRedirect(reverse("user:profile", kwargs={"slug":user.slug}))
-    # Redireciona para a página do perfil do usuário caso o método da requisição não seja POST
+
+    # Redirects to the user's profile page if the request method is not POST
     return HttpResponseRedirect(reverse("user:profile", kwargs={"slug":slug}))
 
 
 @login_required
 def profile_config_update(request, slug):
-    """
-    View para atualização das configurações do perfil do usuário.
-
-    Essa view é acessível apenas para usuários autenticados.
+    '''
+    View for updating the user's profile settings.
 
     Args:
-        request (HttpRequest): O objeto HttpRequest contendo os dados da requisição.
-        slug (str): O slug do usuário cuja senha será atualizada.
+        request (HttpRequest): The HttpRequest object containing the request data.
+        slug (str): The slug of the user whose password will be updated.
 
     Returns:
-        HttpResponseRedirect: Redireciona para a página do perfil do usuário após a atualização das suas configurações.
-    """
+        HttpResponseRedirect: Redirects to the user's profile page after updating their profile settings.
+
+    Notes:
+        This view is only accessible to authenticated users.
+    '''
 
     if request.method == "POST":
-        # Obtém o usuário autenticado com base no slug do usuário da requisição
+        # Get the authenticated user based on the request user's slug
         slug = request.user.slug
         user = User.objects.get(slug=slug)
-        # Cria o formulário com os dados do usuário e os dados enviados pelo formulário POST
+        # Creates the form with the user's data and the data sent by the POST form
         form = UserProfileConfigForm(request.POST, instance=user)
-        # Caso o formulário seja válido salva as novas configurações no banco de dados
+        # If the form is valid, save the new settings to the database
         if (form.is_valid()):
             form.save()
-            # Adiciona uma mensagem de sucesso para ser exibida na próxima página
+            # Add a success message to be displayed on the next page
             messages.add_message(request, constants.SUCCESS, 'Configurações atualizadas com sucesso!')
         else:
-            # Se o formulário não for válido, exibe uma mensagem de erro para cada erro encontrado
+            # If the form is not valid, display an error message for each error found
             messages.add_message(request, constants.ERROR, 'Erro na alteração das configurações!')
             for field_name, errors in form.errors.items():
                 for error in errors:
                     messages.add_message(request, constants.ERROR, f'{error}')
-        # Redireciona para a página do perfil do usuário após a atualização das suas configurações
+        # Redirects to the user's profile page after updating their profile settings
         return HttpResponseRedirect(reverse("user:profile", kwargs={"slug":slug}))
-    # Redireciona para a página do perfil do usuário caso o método da requisição não seja POST
+
+    # Redirects to the user's profile page if the request method is not POST
     return HttpResponseRedirect(reverse("user:profile", kwargs={"slug":slug}))
 
 
 @login_required
 def profile_password_update(request, slug):
-    """
-    View para atualização de senha do perfil de usuário.
-
-    Essa view é acessível apenas para usuários autenticados.
+    '''
+    View for updating the user's password.
 
     Args:
-        request (HttpRequest): O objeto HttpRequest contendo os dados da requisição.
-        slug (str): O slug do usuário cuja senha será atualizada.
+        request (HttpRequest): The HttpRequest object containing the request data.
+        slug (str): The slug of the user whose password will be updated.
 
     Returns:
-        HttpResponseRedirect: Redireciona para a página de login após a atualização da senha.
-    """
+        HttpResponseRedirect: Redirects to the login page after updating the password.
+
+    Notes:
+        This view is only accessible to authenticated users.
+    '''
     
     if request.method == "POST":
-        # Obtém o usuário autenticado com base no slug do usuário da requisição
+        # Get the authenticated user based on the request user's slug
         slug = request.user.slug
         user = User.objects.get(slug=slug)
-        # Cria o formulário com os dados do usuário e os dados enviados pelo formulário POST
+        # Creates the form with the user's data and the data sent by the POST form
         form = PasswordChangeForm(user, request.POST)
-        # Caso o formulário seja válido salva a nova senha no banco de dados
+        # If the form is valid, save the new password to the database
         if (form.is_valid()):
             form.save()
-            # Adiciona uma mensagem de sucesso para ser exibida na próxima página
+            # Add a success message to be displayed on the next page
             messages.add_message(request, constants.SUCCESS, 'Senha atualizada com sucesso!')
-            # Redireciona para a página de login após a atualização da senha
+            # Redirects to the login page after updating the password
             return HttpResponseRedirect(reverse("logout"))
         else:
-            # Se o formulário não for válido, exibe uma mensagem de erro para cada erro encontrado
+            # If the form is not valid, display an error message for each error found
             messages.add_message(request, constants.ERROR, 'Erro na alteração da senha!')
             for field_name, errors in form.errors.items():
                 for error in errors:
                     messages.add_message(request, constants.ERROR, f'{error}')
-            # Redireciona para a página do perfil do usuário em caso de erro
+            # Redirects to the user's profile page if the request method is not POST
             return HttpResponseRedirect(reverse("user:profile", kwargs={"slug":slug}))
 
-    # Redireciona para a página de login caso o método da requisição não seja POST
+    # Redirects to the login page if the request method is not POST
     return HttpResponseRedirect(reverse("user:profile", kwargs={"slug":slug}))
+
+
+@login_required
+def remove_friend(request):
+    '''
+    View for removing a user from the user's friends list.
+
+    Args:
+        request (HttpRequest): The HttpRequest object containing the request data.
+
+    Returns:
+        HttpResponseRedirect: Redirects to the user's notifications page after removing the friend.
+
+    Notes:
+        This view is only accessible to authenticated users.
+    '''
+
+    if request.method == "POST":
+        # Get the user to be removed from the POST data
+        try:
+            user_id = request.POST.get("user_id")
+            user = User.objects.get(id=user_id)
+            # Remove the user from the user's friends list
+            request.user.amigos.remove(user)
+            user.amigos.remove(request.user)
+            # Add a success message to be displayed on the next page
+            messages.add_message(request, constants.SUCCESS, f'"{user}" removido(a) da sua lista de amigos.')
+        except User.DoesNotExist:
+            # If the user does not exist, add an error message to be displayed on the next page
+            messages.add_message(request, constants.ERROR, 'Usuário não encontrado.')
+            # Redirects to the user's profile page after removing the friend
+            return HttpResponseRedirect(reverse("user:profile"))
+    
+    # Redirects to the user's profile page if the request method is not POST
+    return HttpResponseRedirect(reverse("user:profile"))

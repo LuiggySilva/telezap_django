@@ -57,10 +57,30 @@ class User(AbstractUser):
         ('NM', 'Ninguém'), 
     )
 
-    config_email_visibility = models.CharField(max_length=2, choices=profile_visibility_types, default=profile_visibility_types[0], verbose_name="Visibilidade do email")
-    config_status_visibility = models.CharField(max_length=2, choices=profile_visibility_types, default=profile_visibility_types[0], verbose_name="Visibilidade do status")
-    config_photo_visibility = models.CharField(max_length=2, choices=profile_visibility_types, default=profile_visibility_types[0], verbose_name="Visibilidade da foto")
-    config_online_visibility = models.CharField(max_length=2, choices=profile_visibility_types, default=profile_visibility_types[0], verbose_name="Visibilidade do online")
+    config_email_visibility = models.CharField(
+        max_length=2, 
+        choices=profile_visibility_types, 
+        default=profile_visibility_types[0], 
+        verbose_name="Visibilidade do email"
+    )
+    config_status_visibility = models.CharField(
+        max_length=2, 
+        choices=profile_visibility_types, 
+        default=profile_visibility_types[0], 
+        verbose_name="Visibilidade do status"
+    )
+    config_photo_visibility = models.CharField(
+        max_length=2, 
+        choices=profile_visibility_types, 
+        default=profile_visibility_types[0], 
+        verbose_name="Visibilidade da foto"
+    )
+    config_online_visibility = models.CharField(
+        max_length=2,
+        choices=profile_visibility_types,
+        default=profile_visibility_types[0], 
+        verbose_name="Visibilidade do online"
+    )
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
@@ -70,3 +90,18 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username}"
+
+
+    def have_pending_notifications(self):
+        from apps.util import user_has_pending_notifications 
+        return user_has_pending_notifications(self)
+
+
+    #TODO: Implementar
+    def have_pending_group_messages(self):
+        return False
+
+
+    #TODO: Implementar
+    def have_pending_chat_messages(self):
+        return False

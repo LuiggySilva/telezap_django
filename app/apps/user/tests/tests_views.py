@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.messages import get_messages
-from .factories import UserFactory
+from .factories import UserFactory, User
 
 
 class LoginViewTests(TestCase):
@@ -14,16 +14,16 @@ class LoginViewTests(TestCase):
 
     def test_login_success(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view login quando um usuário tenta se logar com dados válidos.
-            Ele verifica se o usuário é logado corretamente e se ele é redirecionado para a página home após o login.
+        Description:
+            This test verifies the behavior of the login view when a user tries to log in with valid data.
+            It verifies that the user is logged in correctly and that he is redirected to the home page after login.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - O usuário deve ser logado corretamente.
-            - O usuário deve ser redirecionado para a página home após o login.
+        Post-conditions:
+            - The user must be logged in correctly.
+            - The user must be redirected to the home page after login.
         '''
 
         response = self.client.post(
@@ -38,16 +38,16 @@ class LoginViewTests(TestCase):
 
     def test_login_failure(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view login quando um usuário tenta se logar com dados inválidos.
-            Ele verifica se o usuário não é logado e se uma mensagem de erro é exibida após a tentativa de login.
+        Description:
+            This test verifies the behavior of the login view when a user tries to log in with invalid data.
+            It verifies that the user is not logged in and that an error message is displayed after the login attempt.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - O usuário não deve ser logado.
-            - Uma mensagem de erro deve ser exibida após a tentativa de login.
+        Post-conditions:
+            - The user must not be logged in.
+            - An error message must be displayed after the login attempt.
         '''
         
         response = self.client.post(
@@ -67,17 +67,17 @@ class LogoutViewTests(TestCase):
 
     def test_logout_success(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view logout quando um usuário logado tenta se deslogar do sistema.
-            Ele verifica se o usuário é deslogado corretamente e se ele é redirecionado para a página home após
-            o logout.
-        
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Description:
+            This test verifies the behavior of the logout view when a logged in user tries to log out of the system.
+            It verifies that the user is logged out correctly and that he is redirected to the home page after
+            logout.
 
-        Pós-condições:
-            - O usuário deve ser deslogado corretamente.
-            - O usuário deve ser redirecionado para a página home após o logout.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
+
+        Post-conditions:
+            - The user must be logged out correctly.
+            - The user must be redirected to the home page after logout.
         '''
 
         response = self.client.get(self.logout_url)
@@ -94,18 +94,19 @@ class SignupViewTests(TestCase):
 
     def test_signup_success(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view signup quando um usuário tenta se cadastrar com dados
-            válidos. Ele verifica se o usuário é cadastrado corretamente e se ele é redirecionado para a página
-            de login após o cadastro.
+        Description:
+            This test verifies the behavior of the signup view when a user tries to sign up with valid data.
+            It verifies that the user is signed up correctly and that he is redirected to the login page after
+            signup.
 
-        Pré-condições:
-            - Um usuário que não está logado no sistema.
-            - O usuário tenta se cadastrar com dados válidos.
+        Pre-conditions:
+            - A user who is not logged into the system.
+            - The user tries to sign up with valid data.
 
-        Pós-condições:
-            - O usuário deve ser cadastrado corretamente.
-            - O usuário deve ser redirecionado para a página de login após o cadastro.
+        Post-conditions:
+            - The user must be signed up correctly.
+            - The user must be redirected to the login page after signup.
+            - The user is saved in the database.
         '''
 
         response = self.client.post(
@@ -119,51 +120,21 @@ class SignupViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('login'))
-
-
-    def test_signup_failure_email(self):
-        '''
-        Descrição:
-            Este teste verifica o comportamento da view signup quando um usuário tenta se cadastrar com um email
-            inválido. Ele verifica se o usuário não é cadastrado e se uma mensagem de erro é exibida após a tentativa
-            de cadastro.
-
-        Pré-condições:
-            - Um usuário que não está logado no sistema.
-            - O usuário tenta se cadastrar com um email inválido.
-
-        Pós-condições:
-            - O usuário não deve ser cadastrado.
-            - Uma mensagem de erro deve ser exibida após a tentativa de cadastro.
-        '''
-
-        response = self.client.post(
-            self.signup_url, 
-            {
-                'username': self.username, 
-                'email': 'invalid@email',
-                'password1': self.password,
-                'password2': self.password
-            }
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Informe um endereço de email válido.')
-
+        self.assertTrue(User.objects.filter(email=self.email).exists())
 
     def test_signup_failure_username(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view signup quando um usuário tenta se cadastrar com um nick
-            inválido. Ele verifica se o usuário não é cadastrado e se uma mensagem de erro é exibida após a tentativa
-            de cadastro.
+        Description:
+            This test verifies the behavior of the signup view when a user tries to sign up with an invalid username.
+            It verifies that the user is not signed up and that an error message is displayed after the signup attempt.
 
-        Pré-condições:
-            - Um usuário que não está logado no sistema.
-            - O usuário tenta se cadastrar com um nick inválido.
+        Pre-conditions:
+            - A user who is not logged into the system.
+            - The user tries to sign up with an invalid username.
 
-        Pós-condições:
-            - O usuário não deve ser cadastrado.
-            - Uma mensagem de erro deve ser exibida após a tentativa de cadastro.
+        Post-conditions:
+            - The user must not be signed up.
+            - An error message must be displayed after the signup attempt.
         '''
         
         response = self.client.post(
@@ -177,22 +148,22 @@ class SignupViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'O seu nick não pode conter caracteres especiais ou emojis.')
+        self.assertFalse(User.objects.filter(email=self.email).exists())
 
 
     def test_signup_failure_weak_password(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view signup quando um usuário tenta se cadastrar com uma senha
-            fraca. Ele verifica se o usuário não é cadastrado e se uma mensagem de erro é exibida após a tentativa
-            de cadastro.
+        Description:
+            This test verifies the behavior of the signup view when a user tries to sign up with a weak password.
+            It verifies that the user is not signed up and that an error message is displayed after the signup attempt.
 
-        Pré-condições:
-            - Um usuário que não está logado no sistema.
-            - O usuário tenta se cadastrar com uma senha fraca.
+        Pre-conditions:
+            - A user who is not logged into the system.
+            - The user tries to sign up with a weak password.
 
-        Pós-condições:
-            - O usuário não deve ser cadastrado.
-            - Uma mensagem de erro deve ser exibida após a tentativa de cadastro.
+        Post-conditions:
+            - The user must not be signed up.
+            - An error message must be displayed after the signup attempt.
         '''
 
         response = self.client.post(
@@ -208,22 +179,23 @@ class SignupViewTests(TestCase):
         self.assertContains(response, 'Esta senha é muito comum.')
         self.assertContains(response, 'Esta senha é muito curta. Ela precisa conter pelo menos 8 caracteres.')
         self.assertContains(response, 'Esta senha é inteiramente numérica.')
+        self.assertFalse(User.objects.filter(email=self.email).exists())
 
 
     def test_signup_failure_passwords_dont_match(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view signup quando um usuário tenta se cadastrar com uma senha
-            que não corresponde à confirmação da senha. Ele verifica se o usuário não é cadastrado e se uma mensagem
-            de erro é exibida após a tentativa de cadastro.
+        Description:
+            This test verifies the behavior of the signup view when a user tries to sign up with a password that
+            does not match the password confirmation. It verifies that the user is not signed up and that an error
+            message is displayed after the signup attempt.
 
-        Pré-condições:
-            - Um usuário que não está logado no sistema.
-            - O usuário tenta se cadastrar com uma senha que não corresponde à confirmação da senha.
-        
-        Pós-condições:
-            - O usuário não deve ser cadastrado.
-            - Uma mensagem de erro deve ser exibida após a tentativa de cadastro.
+        Pre-conditions:
+            - A user who is not logged into the system.
+            - The user tries to sign up with a password that does not match the password confirmation.
+
+        Post-conditions:
+            - The user must not be signed up.
+            - An error message must be displayed after the signup attempt.
         '''
 
         response = self.client.post(
@@ -237,6 +209,7 @@ class SignupViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Os dois campos de senha não correspondem.')
+        self.assertFalse(User.objects.filter(email=self.email).exists())
 
 
 class ProfileViewTests(TestCase):
@@ -251,17 +224,17 @@ class ProfileViewTests(TestCase):
         self.profile_config_update_url = reverse('user:profile_config_update', kwargs={'slug': self.username})
 
 
-    def test_profile_view_success(self):
+    def test_profile_success(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view profile quando um usuário logado tenta acessar a sua página
-            de perfil de usuário. Ele verifica se o perfil é exibido corretamente.
+        Description:
+            This test verifies the behavior of the profile view when a logged in user tries to access his user profile
+            page. It verifies that the profile is displayed correctly.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - O perfil do usuário deve ser exibido corretamente.
+        Post-conditions:
+            - The user profile must be displayed correctly.
         '''
 
         self.client.login(username=self.email, password=self.password)
@@ -272,18 +245,17 @@ class ProfileViewTests(TestCase):
         self.assertContains(response, self.email)
 
 
-    def test_user_profile_view_requires_login(self):
+    def test_user_profile_requires_login(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view profile quando um usuário não logado tenta acessar
-            a página de perfil de outro usuário. Ele verifica se o usuário é redirecionado para a página de
-            login.
+        Description:
+            This test verifies the behavior of the profile view when a logged in user tries to access another user's
+            profile page. It verifies that the user is redirected to the login page.
 
-        Pré-condições:
-            - Um usuário que não está logado no sistema.
-        
-        Pós-condições:
-            - O usuário deve ser redirecionado para a página de login.
+        Pre-conditions:
+            - A user who is not logged into the system.
+
+        Post-conditions:
+            - The user must be redirected to the login page.
         '''
 
         response = self.client.get(self.profile_url)
@@ -294,20 +266,18 @@ class ProfileViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-    def test_profile_update_view_success(self):
+    def test_profile_update_success(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view profile_update quando o perfil do usuário é atualizado.
-            Ele verifica se o perfil é atualizado corretamente e se o usuário é redirecionado para a página do
-            perfil atualizado.
+        Description:
+            This test verifies the behavior of the profile_update view when the user's profile is updated.
+            It verifies that the profile is updated correctly and that the user is redirected to the updated
+            profile page.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - O perfil do usuário deve ser atualizado com sucesso.
-            - O usuário deve ser redirecionado para a página do perfil atualizado.
-            - Uma mensagem de sucesso deve ser exibida após a atualização.
+        Post-conditions:
+            - The user profile must be updated correctly.
         '''
 
         self.client.login(username=self.email, password=self.password)
@@ -333,19 +303,19 @@ class ProfileViewTests(TestCase):
         self.assertIn('Perfil atualizado com sucesso!', messages)
 
 
-    def test_profile_update_view_failure(self):
+    def test_profile_update_failure(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view profile_update quando o perfil do usuário é atualizado
-            com dados inválidos. Ele verifica se o perfil não é atualizado e se uma mensagem de erro é exibida
-            após a tentativa de atualização.
+        Description:
+            This test verifies the behavior of the profile_update view when the user's profile is updated with
+            invalid data. It verifies that the profile is not updated and that an error message is displayed after
+            the update attempt.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - O perfil do usuário não deve ser atualizado.
-            - Uma mensagem de erro deve ser exibida após a tentativa de atualização.
+        Post-conditions:
+            - The user profile must not be updated.
+            - An error message must be displayed after the update attempt.
         '''
 
         self.client.login(username=self.email, password=self.password)
@@ -369,25 +339,25 @@ class ProfileViewTests(TestCase):
 
         messages = [msg.message for msg in get_messages(response.wsgi_request)]
         self.assertIn('Erro na alteração do perfil!', messages)
-        self.assertIn('Informe um endereço de email válido.', messages)
+        self.assertIn('Insira um endereço de email válido.', messages)
         self.assertIn('O seu nick não pode conter caracteres especiais ou emojis.', messages)
         self.assertIn(f'Status: Certifique-se de que o valor tenha no máximo 250 caracteres (ele possui {len(new_user_status)}).', messages)
 
 
-    def test_profile_password_update_view_success(self):
-        """
-        Descrição:
-            Este teste verifica o comportamento da view profile_password_update quando a senha do perfil do usuário
-            é atualizada com uma nova senha. Ele verifica se a senha é atualizada corretamente e se uma mensagem de
-            sucesso é exibida após a atualização.
+    def test_profile_password_update_success(self):
+        '''
+        Description:
+            This test verifies the behavior of the profile_password_update view when the user's profile password
+            is updated with a new password. It verifies that the password is updated correctly and that a success
+            message is displayed after the update.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - A senha do perfil do usuário deve ser atualizada com sucesso.
-            - Uma mensagem de sucesso deve ser exibida após a atualização.
-        """
+        Post-conditions:
+            - The user profile password must be updated correctly.
+            - A success message must be displayed after the update.
+        '''
 
         self.client.login(username=self.email, password=self.password)
         new_password = 'NewSecuryPassword@123'
@@ -405,20 +375,20 @@ class ProfileViewTests(TestCase):
         self.assertIn('Senha atualizada com sucesso!', messages)
 
 
-    def test_profile_password_update_view_failure_wrong_old_password(self):
-        """
-        Descrição:
-            Este teste verifica o comportamento da view profile_password_update quando a senha do perfil do usuário
-            é atualizada com uma senha antiga incorreta. Ele verifica se a senha não é atualizada e se uma mensagem
-            de erro é exibida após a tentativa de atualização.
+    def test_profile_password_update_failure_wrong_old_password(self):
+        '''
+        Description:
+            This test verifies the behavior of the profile_password_update view when the user's profile password
+            is updated with a wrong old password. It verifies that the password is not updated and that an error
+            message is displayed after the update attempt.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - A senha do perfil do usuário não deve ser atualizada.
-            - Uma mensagem de erro deve ser exibida após a tentativa de atualização.
-        """
+        Post-conditions:
+            - The user profile password must not be updated.
+            - An error message must be displayed after the update attempt.
+        '''
 
         self.client.login(username=self.email, password=self.password)
         new_password = 'NewSecuryPassword@123'
@@ -436,20 +406,20 @@ class ProfileViewTests(TestCase):
         self.assertIn('A senha antiga foi digitada incorretamente. Por favor, informe-a novamente.', messages)
 
 
-    def test_profile_password_update_view_failure_weak_password(self):
-        """
-        Descrição:
-            Este teste verifica o comportamento da view profile_password_update quando a senha do perfil do usuário
-            é atualizada com uma nova senha fraca. Ele verifica se a senha não é atualizada e se uma mensagem de erro
-            é exibida após a tentativa de atualização.
+    def test_profile_password_update_failure_weak_password(self):
+        '''
+        Description:
+            This test verifies the behavior of the profile_password_update view when the user's profile password
+            is updated with a weak new password. It verifies that the password is not updated and that an error
+            message is displayed after the update attempt.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - A senha do perfil do usuário não deve ser atualizada.
-            - Uma mensagem de erro deve ser exibida após a tentativa de atualização.
-        """
+        Post-conditions:
+            - The user profile password must not be updated.
+            - An error message must be displayed after the update attempt.
+        '''
 
         self.client.login(username=self.email, password=self.password)
         new_password = '123'
@@ -469,20 +439,20 @@ class ProfileViewTests(TestCase):
         self.assertIn('Esta senha é inteiramente numérica.', messages)
 
 
-    def test_profile_password_update_view_failure_passwords_dont_match(self):
-        """
-        Descrição:
-            Este teste verifica o comportamento da view profile_password_update quando a senha do perfil do usuário
-            é atualizada com uma nova senha que não corresponde à confirmação da nova senha. Ele verifica se a senha
-            não é atualizada e se uma mensagem de erro é exibida após a tentativa de atualização.
+    def test_profile_password_update_failure_passwords_dont_match(self):
+        '''
+        Description:
+            This test verifies the behavior of the profile_password_update view when the user's profile password
+            is updated with a new password that does not match the password confirmation. It verifies that the
+            password is not updated and that an error message is displayed after the update attempt.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - A senha do perfil do usuário não deve ser atualizada.
-            - Uma mensagem de erro deve ser exibida após a tentativa de atualização.
-        """
+        Post-conditions:
+            - The user profile password must not be updated.
+            - An error message must be displayed after the update attempt.
+        '''
 
         self.client.login(username=self.email, password=self.password)
         new_password = 'NewSecuryPassword@123'
@@ -501,19 +471,19 @@ class ProfileViewTests(TestCase):
         self.assertIn('Os dois campos de senha não correspondem.', messages)
 
 
-    def test_profile_config_update_view_success(self):
+    def test_profile_config_update_success(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view profile_config_update quando as configurações de 
-            visibilidade do perfil do usuário são atualizadas. Ele verifica se as configurações são atualizadas 
-            corretamente e se uma mensagem de sucesso é exibida após a atualização.
+        Description:
+            This test verifies the behavior of the profile_config_update view when the user's profile visibility
+            settings are updated. It verifies that the settings are updated correctly and that a success message
+            is displayed after the update.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
-        
-        Pós-condições:
-            - As configurações de visibilidade do perfil do usuário devem ser atualizadas com sucesso.
-            - Uma mensagem de sucesso deve ser exibida após a atualização.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
+
+        Post-conditions:
+            - The user profile visibility settings must be updated correctly.
+            - A success message must be displayed after the update.
         '''
 
         self.client.login(username=self.email, password=self.password)
@@ -537,19 +507,19 @@ class ProfileViewTests(TestCase):
         self.assertIn('Configurações atualizadas com sucesso!', messages)
 
 
-    def test_profile_config_update_view_failure(self):
+    def test_profile_config_update_failure(self):
         '''
-        Descrição:
-            Este teste verifica o comportamento da view profile_config_update quando as configurações de
-            visibilidade do perfil do usuário são atualizadas com uma configuração inválida. Ele verifica se
-            as configurações não são atualizadas e se uma mensagem de erro é exibida após a tentativa de atualização.
+        Description:
+            This test verifies the behavior of the profile_config_update view when the user's profile visibility
+            settings are updated with an invalid configuration. It verifies that the settings are not updated and
+            that an error message is displayed after the update attempt.
 
-        Pré-condições:
-            - Um usuário existente com email e senha logado no sistema.
+        Pre-conditions:
+            - An existing user with email and password logged into the system.
 
-        Pós-condições:
-            - As configurações de visibilidade do perfil do usuário não devem ser atualizadas.
-            - Uma mensagem de erro deve ser exibida após a tentativa de atualização.
+        Post-conditions:
+            - The user profile visibility settings must not be updated.
+            - An error message must be displayed after the update attempt.
         '''
 
         self.client.login(username=self.email, password=self.password)

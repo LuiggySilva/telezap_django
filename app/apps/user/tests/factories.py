@@ -19,8 +19,8 @@ class UserFactory(factory.django.DjangoModelFactory):
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
         '''
-            Sobrescreve o método _create da classe base para que a imagem de perfil seja criada e 
-            deletada após a criação do usuário.   
+            Overwrites the _create method of the base class so that the profile image is created and
+            deleted after the user is created.
         '''
 
         photo_field = model_class._meta.get_field('photo')

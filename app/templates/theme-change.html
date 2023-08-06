@@ -1,6 +1,6 @@
 {% load static %}
 
-<div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle" style="z-index: 100;">
+<div id="theme-change-btn" class="dropdown bd-mode-toggle">
     <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center btn-theme-change-container" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (dark)">
       <img id="active-theme" src="{% static 'base/img/auto-theme.svg' %}" width="20" height="20" alt="auto">
       <svg class="bi my-1 theme-icon-active" width="1em" height="1em"><use href="{% static 'base/img/auto-theme.png' %}"></use></svg>

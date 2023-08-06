@@ -21,12 +21,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
     # apps internos
     'apps.user',
     'apps.notification',
@@ -34,13 +28,33 @@ INSTALLED_APPS = [
     'apps.group_chat',
     'apps.videocall',
     # apps externos
+    'daphne',
+    'rest_framework',
+    'django_extensions',
+    # apps django
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # debug_toolbar deve ser o último app
     'debug_toolbar',
 ]
 
 
-INTERNAL_IPS = [ # Pro debug toolbar
-    "127.0.0.1",
-]
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
 
 
 MIDDLEWARE = [
@@ -76,6 +90,7 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'telezap_django.wsgi.application'
+ASGI_APPLICATION = "telezap_django.asgi.application"
 
 
 LOGIN_REDIRECT_URL='/'
@@ -153,6 +168,9 @@ MESSAGE_TAGS = {
 if DEBUG:
     MIDDLEWARE += [
         'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ]
+    INTERNAL_IPS = [
+        "127.0.0.1",
     ]
     if 'test' in sys.argv:
         DEBUG_TOOLBAR_CONFIG = {

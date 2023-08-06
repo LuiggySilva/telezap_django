@@ -1,4 +1,6 @@
 from emoji_data_python import emoji_data
+from django.db.models import Q
+from apps.notification.models import FriendshipRequest, GroupRequest
 
 def get_all_emojis():
     emojis_categories = {
@@ -24,3 +26,12 @@ def get_all_emojis():
     del emojis_categories['Flags']
 
     return emojis_categories
+
+
+def user_has_pending_notifications(user):
+    if FriendshipRequest.objects.filter(Q(author=user) | Q(receiver=user), status='P').exists():
+        return True
+    elif GroupRequest.objects.filter(Q(author=user) | Q(receiver=user), status='P').exists():
+        return True
+    else:
+        return False

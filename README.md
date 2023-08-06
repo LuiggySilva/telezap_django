@@ -31,9 +31,12 @@ POSTGRES_DB = `<string: equals to .env.prod SQL_DATABASE>`
 
 
 ## Run project without Docker in DEV mode
-1. **RUN** `python ./app/manage.py migrate`
-2. **RUN** `python ./app/manage.py runserver`
-3. Go to [http://localhost:8000](http://localhost:8000) in browser
+1. **RUN** `python -m venv venv`
+2. **RUN** *Windowns:* `venv/bin/activate.bat` | *Linux:* `source venv/bin/activate`
+3. **RUN** `pip install -r requirements.txt`
+4. **RUN** `python ./app/manage.py migrate`
+5. **RUN** `python ./app/manage.py runserver`
+6. Go to [http://localhost:8000](http://localhost:8000) in browser
 
 
 ## Run project with Docker in DEV mode
@@ -58,3 +61,13 @@ POSTGRES_DB = `<string: equals to .env.prod SQL_DATABASE>`
 5. **RUN** `docker rmi telezap_django-web`
 6. **RUN** `docker volume remove telezap_django_postgres_data` ***(IF RUN IN PROD)***
 7. **RUN** `docker network remove telezap_django_default`
+
+
+# RUN PROJECT TESTS
+
+## Run all tests
+- **RUN** `python manage.py test apps/*/`
+
+## Run single app tests
+- **RUN** `python manage.py test apps/<app_name>/`
+> ***APPS NAMES***: user | notification | chat | group_chat | videocall

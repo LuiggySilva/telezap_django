@@ -1,0 +1,59 @@
+{% load static %}
+
+<div class="notification-info {% if not is_group %}pt-2 pb-2{% endif %}">
+    <div class="notification-user-photo w-100">
+        {% if notification.author.photo %}
+            <img id="user-photo" src="{{ notification.author.photo.url }}" alt="{{ notification.author.photo.name }}">
+        {% else %}
+            <img id="user-photo" src="{% static 'base/img/profile-photo.jpg' %}" alt="Sem foto de perfil">
+        {% endif %}
+    </div>
+    <div class="notification-status w-100 mb-2">
+        {% if is_group %}
+            <button type="button" class="btn btn-outline-secondary rounded-pill btn-sm" data-bs-toggle="collapse" data-bs-target="#grupo{{notification.group}}" role="button" aria-expanded="false" aria-controls="grupo{{notification.group}}">
+                Grupo
+            </button>
+        {% endif %}
+    </div>
+    <div class="notification-username">
+        <strong class="mb-1">{{ notification.author.username }}</strong>
+    </div>
+    <div class="notification-user-email">
+        <small>{{ notification.author.email }}</small>
+    </div>
+    <div class="notification-date">
+        <small>{{notification.date}}</small>
+    </div>
+    <div class="notification-btns">
+        {% if notification.is_finished %}
+            {% if is_group %}
+                <small><span id="grupo-{{notification.group}}-{{notification.id}}-status">{{ notification.get_status_display }}</span></small>
+            {% else %}
+                <small><span id="amizade-{{notification.id}}-status">{{ notification.get_status_display }}</span></small>
+            {% endif %}
+        {% else %}
+            <form action="{% url 'notification:reply_notification_request' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="notification_id" value="{{ notification.id }}">
+                <input type="hidden" name="notification_type" value="{{ notification.notification_type }}">
+                <input type="hidden" name="reply" value="1">
+                <button type="submit" class="btn btn-success rounded-pill">Aceitar</button>
+            </form>
+            <form action="{% url 'notification:reply_notification_request' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="notification_id" value="{{ notification.id }}">
+                <input type="hidden" name="notification_type" value="{{ notification.notification_type }}">
+                <input type="hidden" name="reply" value="0">
+                <button type="submit" class="btn btn-danger rounded-pill">Recusar</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% if is_group %}
+    <div class="collapse grupo-info" id="grupo{{notification.group}}">
+        <p>Grupo: {{notification.group}} </p>
+        <p>Descrição: ...</p>
+        <p>Membros: ...</p>
+    </div>
+{% endif %}
+<hr>

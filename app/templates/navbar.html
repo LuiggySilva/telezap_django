@@ -1,23 +1,41 @@
 {% load static %}
 
-<ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+<ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0 navbar">
     {% if user_is_authenticated %}
         {% if opt == "msg" %}
             <li><a href="#" class="nav-link nav-link-active"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">Conversas</a></li>
-            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">Grupos</a></li>
-            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">Notificações</a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">
+                <span class="{% if request.user.have_pending_group_messages %} blinking-text {% endif %}">Grupos</span>
+            </a></li>
+            <li><a href="{% url 'notification:notifications' %}" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">
+                <span class="{% if request.user.have_pending_notifications %} blinking-text {% endif %}">Notificações</span>
+            </a></li>
         {% elif opt == "group" %}
-            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">Conversas</a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">
+                <span class="{% if request.user.have_pending_chat_messages %} blinking-text {% endif %}">Conversas</span>
+            </a></li>
             <li><a href="#" class="nav-link nav-link-active"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">Grupos</a></li>
-            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">Notificações</a></li>
+            <li><a href="{% url 'notification:notifications' %}" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">
+                <span class="{% if request.user.have_pending_notifications %} blinking-text {% endif %}">Notificações</span>
+            </a></li>
         {% elif opt == "notification" %}
-        <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">Conversas</a></li>
-        <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">Grupos</a></li>
-        <li><a href="#" class="nav-link nav-link-active"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">Notificações</a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">
+                <span class="{% if request.user.have_pending_chat_messages %} blinking-text {% endif %}">Conversas</span>
+            </a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">
+                <span class="{% if request.user.have_pending_group_messages %} blinking-text {% endif %}">Grupos</span>
+            </a></li>
+            <li><a href="{% url 'notification:notifications' %}" class="nav-link nav-link-active"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">Notificações</a></li>
         {% else %}
-            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">Conversas</a></li>
-            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">Grupos</a></li>
-            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">Notificações</a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/msg.png' %}" width="24" height="24" alt="conversas">
+                <span class="{% if request.user.have_pending_chat_messages %} blinking-text {% endif %}">Conversas</span>
+            </a></li>
+            <li><a href="#" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/group.png' %}" width="24" height="24" alt="grupos">
+                <span class="{% if request.user.have_pending_group_messages %} blinking-text {% endif %}">Grupos</span>
+            </a></li>
+            <li><a href="{% url 'notification:notifications' %}" class="nav-link"><img class="nav-bar-icon" src="{% static 'base/img/notification.png' %}" width="24" height="24" alt="notificacoes">
+                <span class="{% if request.user.have_pending_notifications %} blinking-text {% endif %}">Notificações</span>
+            </a></li>
         {% endif %}
     {% endif %}
 </ul>

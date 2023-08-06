@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notificações{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'notification/css/notifications.css' %}">
+    <script src="{% static 'notification/js/notifications.js' %}" defer></script>
+{% endblock head %}
+
+{% block navbar %}
+    {% include 'navbar.html' with user_is_authenticated=request.user.is_authenticated opt="notification" slug=request.user.slug %}
+{% endblock navbar %}
+
+{% block body %}
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <h2>Enviar solicitação de amizade</h2>
+        <form action="{% url 'notification:notifications' %}" method="POST">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="email" name="email" class="form-control" placeholder="Email do usuário" aria-label="Search" aria-describedby="search-addon">
+                <button type="submit" class="btn btn-outline-primary">Buscar</button>
+            </div>
+        </form>
+        {% if user_search_result %}
+            <div>
+                <form action="{% url 'notification:send_friend_request' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="email" value="{{user_search_result.email}}">
+                    <div class="list-group list-group-flush border-bottom scrollarea">
+                        <div class="list-group-item list-group-item-action py-3 lh-sm" aria-current="true">
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                                {% if user_search_result.photo %}
+                                    <img id="user-photo" src="{{ user_search_result.photo.url }}" alt="{{ user_search_result.photo.name }}">
+                                {% else %}
+                                    <img id="user-photo" src="{% static 'base/img/profile-photo.jpg' %}" alt="Sem foto de perfil">
+                                {% endif %}
+                                <strong class="mb-1">{{ user_search_result.username }}</strong>
+                                <small>{{ user_search_result.email }}</small>
+                                <button type="submit" class="btn btn-success rounded-pill px-3">Enviar solicitação</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        <br>
+        <br>
+
+        <div>   
+            <div class="notification-title">
+                <h2 class="notifications-title">Solicitações de amizade</h2>
+                {% if friend_requests_sent|some_finished:request.user or friend_requests_received|some_finished:request.user %}
+                    <form id="friend-finished-remove-form" style="visibility: hidden;" action="{% url 'notification:remove_notifications' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="notification_type" value="A">
+                        <button type="submit" class="btn btn-outline-secondary btn-xs">Remover finalizadas</button>
+                    </form>
+                {% else %}
+                    <form id="friend-finished-remove-form" style="visibility: visible;" action="{% url 'notification:remove_notifications' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="notification_type" value="A">
+                        <button type="submit" class="btn btn-outline-secondary btn-xs">Remover finalizadas</button>
+                    </form>
+                {% endif %}
+            </div>
+            <div>
+                <h4 class="fst-italic fw-lighter">Enviadas</h4>
+                <div id="friend-send-notifications">
+                    <hr>
+                    {% for notification in friend_requests_sent %}
+                        {% include 'notification/notification_send.html' with notification=notification is_group=False %}
+                    {% empty %}
+                        <h6 class="m-2">Nenhuma solicitação.</h6>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+            <br><br>
+            <div>
+                <h4 class="fst-italic fw-lighter">Recebidas</h4>
+                <div id="friend-received-notifications">
+                    <hr>
+                    {% for notification in friend_requests_received %}
+                        {% include 'notification/notification_received.html' with notification=notification is_group=False %}
+                    {% empty %}
+                        <h6 class="m-2">Nenhuma solicitação.</h6>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <br>
+        <div>
+            <div class="notification-title">
+                <h2 class="notifications-title">Solicitações de grupo</h2>
+                {% if group_requests_sent|some_finished:request.user or group_requests_received|some_finished:request.user %}
+                    <form id="group-finished-remove-form" style="visibility: hidden;" action="{% url 'notification:remove_notifications' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="notification_type" value="G">
+                        <button type="submit" class="btn btn-outline-secondary btn-xs">Remover finalizadas</button>
+                    </form>
+                {% else %}
+                    <form id="group-finished-remove-form" style="visibility: visible;" action="{% url 'notification:remove_notifications' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="notification_type" value="G">
+                        <button type="submit" class="btn btn-outline-secondary btn-xs">Remover finalizadas</button>
+                    </form>
+                {% endif %}
+            </div>
+            <div>
+                <h4 class="fst-italic fw-lighter">Enviadas</h4>
+                <div id="group-send-notifications">
+                    <hr>
+                    {% for notification in group_requests_sent %}
+                        {% include 'notification/notification_send.html' with notification=notification is_group=True %}
+                    {% empty %}
+                        <h6 class="m-2">Nenhuma solicitação.</h6>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+            <br><br>
+            <div>
+                <h4 class="fst-italic fw-lighter">Recebidas</h4>
+                <div id="group-received-notifications">
+                    <hr>
+                    {% for notification in group_requests_received %}
+                        {% include 'notification/notification_received.html' with notification=notification is_group=True %}
+                    {% empty %}
+                        <h6 class="m-2">Nenhuma solicitação.</h6>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <br>
+    </div>
+{% endblock body %}
+
+
+

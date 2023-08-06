@@ -116,3 +116,5 @@ class UserAdminForm(forms.ModelForm):
         if self.instance in friends.all():
             self.add_error('friends', "Você não pode adicionar a si mesmo como amigo.")
         return friends
+
+

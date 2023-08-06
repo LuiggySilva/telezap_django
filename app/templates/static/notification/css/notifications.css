@@ -1,0 +1,92 @@
+#user-photo {
+    overflow: hidden;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+
+.grupo-info {
+    border: 1px solid var(--bs-border-color-translucent);
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 1em;
+}
+
+hr {
+    margin: 0px!important;
+}
+
+.notification-title {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.notification-info {  
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 0fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "notification-user-photo notification-username notification-btns"
+      "notification-user-photo notification-user-email notification-btns"
+      "notification-status notification-date notification-btns";
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    justify-items: start;
+}
+
+.notification-user-photo, .notification-status {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: start;
+    justify-content: center;
+    align-items: center;
+}
+
+.notification-user-photo { grid-area: notification-user-photo; margin-top: 5px;}
+
+.notification-username { grid-area: notification-username; }
+
+.notification-user-email { 
+    grid-area: notification-user-email; 
+    overflow-x: auto; 
+    white-space: nowrap;
+    width: -webkit-fill-available;
+}
+
+.notification-btns { 
+    grid-area: notification-btns;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.notification-btns button {
+    margin: 5px;
+}
+
+.notification-date { grid-area: notification-date; }
+
+.notification-status { grid-area: notification-status; }
+
+.btn-xs {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.65rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+}
+  
+
+@media screen and (max-width: 768px) {
+
+    .notifications-title {
+        font-size: larger;
+    }
+}

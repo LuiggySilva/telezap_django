@@ -14,6 +14,11 @@
 
 {% block body %}
     <main class="form-signin w-100 m-auto">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
         <form action="{% url 'signup' %}" method="POST">
             <h1 class="h3 mb-3 fw-normal">Criar uma conta</h1>
             {% csrf_token %}
