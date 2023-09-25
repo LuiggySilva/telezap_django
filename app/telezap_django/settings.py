@@ -6,56 +6,47 @@ from django.contrib.messages import constants
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 SECRET_KEY = config('SECRET_KEY', cast=str)
-
 
 DEBUG = config('DEBUG', cast=bool, default=False)
 
-
 ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', cast=str).split(" ")
 
-
+# To save session for 12 hours
 SESSION_COOKIE_AGE = 43200
 SESSION_SAVE_EVERY_REQUEST = True
 
+# To paginate messages in chat
+MESSAGES_PAGINATION = 10
 
 INSTALLED_APPS = [
-    # apps internos
+    # internal apps
     'apps.user',
     'apps.notification',
     'apps.chat',
     'apps.group_chat',
     'apps.videocall',
-    # apps externos
+    # external apps
     'daphne',
     'rest_framework',
     'django_extensions',
-    # apps django
+    # django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # debug_toolbar deve ser o último app
+    # debug_toolbar must be the last app
     'debug_toolbar',
 ]
 
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-    },
-}
-
+# To use rest_framework_simplejwt
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
-
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -101,7 +92,7 @@ LOGIN_URL='/login'
 
 AUTH_USER_MODEL='user.User'
 
-
+# To use console email backend
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
@@ -113,7 +104,7 @@ DATABASES = {
         "PASSWORD": config('SQL_PASSWORD', cast=str, default="password"),
         "HOST": config('SQL_HOST', cast=str, default="localhost"),
         "PORT": config('SQL_PORT', cast=str, default="5432"),
-    }
+    },
 }
 
 
@@ -155,7 +146,7 @@ MEDIAFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# To use django.contrib.messages
 MESSAGE_TAGS = {
     constants.DEBUG: 'alert-primary',
     constants.ERROR: 'alert-danger',
@@ -166,13 +157,20 @@ MESSAGE_TAGS = {
 
 
 if DEBUG:
+    # To use channels locally
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        },
+    }
+    # To use debug_toolbar
     MIDDLEWARE += [
         'debug_toolbar.middleware.DebugToolbarMiddleware',
     ]
-    INTERNAL_IPS = [
+    INTERNAL_IPS = [ 
         "127.0.0.1",
     ]
-    if 'test' in sys.argv:
+    if 'test' in sys.argv: # To run tests without debug_toolbar
         DEBUG_TOOLBAR_CONFIG = {
             'SHOW_TOOLBAR_CALLBACK': lambda request: False
         }
@@ -180,3 +178,13 @@ if DEBUG:
         DEBUG_TOOLBAR_CONFIG = {
             'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
         }
+else:
+    # To use channels in production
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("localhost", 6379)],
+            },
+        },
+    }

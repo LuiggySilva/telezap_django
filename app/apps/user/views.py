@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.views.generic import (
     TemplateView, 
     ListView, 
@@ -18,14 +18,13 @@ from django.contrib.messages import constants
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 
-
 from .models import User
 from .forms import (
     CustomUserCreationForm, 
     UserProfileForm,
     UserProfileConfigForm
 )
-from apps.util import get_all_emojis
+from apps.utils import get_all_emojis
 from apps.notification.models import FriendshipRequest, GroupRequest
 
 
@@ -45,6 +44,11 @@ class LandingPageView(TemplateView):
     '''
 
     template_name = 'user/landing_page.html'
+    
+    def get_context_data(self, **kwargs):
+        return {
+            "emojis": get_all_emojis
+        }
 
 
 class SignupView(CreateView):
@@ -100,20 +104,18 @@ class UserProfileView(LoginRequiredMixin, DetailView):
     queryset = User.objects.all()
     context_object_name = "user"
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        # Verify if the user is the authenticated user
+        if self.object != self.request.user:
+            messages.add_message(request, constants.ERROR, 'Você não tem permissão para alterar este perfil!')
+            return HttpResponseRedirect(reverse("user:landing_page"))
+
+        context = self.get_context_data()
+        return self.render_to_response(context)
+
     def get_context_data(self, *args, **kwargs):
-        """
-        Adiciona contextos adicionais ao template.
-
-        Este método é chamado para obter o dicionário de contexto que será passado
-        ao template. Aqui, estamos adicionando os seguintes contextos adicionais:
-        - form_perfil: Um formulário para edição do perfil do usuário.
-        - form_config_perfil: Um formulário para edição das configuraçôes do perfil do usuário.
-        - form_senha_perfil: Um formulário para alteração de senha do usuário.
-        - emojis_categories: Um dicionário contendo emojis agrupados por categoria.
-
-        Returns:
-            dict: Dicionário contendo os contextos adicionais.
-        """
         '''
         Adds additional contexts to the template.
 
@@ -155,6 +157,10 @@ def profile_update(request, slug):
     Notes:
         This view is only accessible to authenticated users.
     '''
+    if request.user.slug != slug:
+        # If the user is not the authenticated user, display an error message
+        messages.add_message(request, constants.ERROR, 'Você não tem permissão para alterar este perfil!')
+        return HttpResponseRedirect(reverse("user:landing_page"))
 
     if request.method == "POST":
         # Get the authenticated user based on the request user's slug
@@ -201,6 +207,11 @@ def profile_config_update(request, slug):
         This view is only accessible to authenticated users.
     '''
 
+    if request.user.slug != slug:
+        # If the user is not the authenticated user, display an error message
+        messages.add_message(request, constants.ERROR, 'Você não tem permissão para alterar este perfil!')
+        return HttpResponseRedirect(reverse("user:landing_page"))
+
     if request.method == "POST":
         # Get the authenticated user based on the request user's slug
         slug = request.user.slug
@@ -241,6 +252,11 @@ def profile_password_update(request, slug):
         This view is only accessible to authenticated users.
     '''
     
+    if request.user.slug != slug:
+        # If the user is not the authenticated user, display an error message
+        messages.add_message(request, constants.ERROR, 'Você não tem permissão para alterar este perfil!')
+        return HttpResponseRedirect(reverse("user:landing_page"))
+    
     if request.method == "POST":
         # Get the authenticated user based on the request user's slug
         slug = request.user.slug
@@ -268,7 +284,7 @@ def profile_password_update(request, slug):
 
 
 @login_required
-def remove_friend(request):
+def remove_friend(request, slug):
     '''
     View for removing a user from the user's friends list.
 
@@ -276,27 +292,30 @@ def remove_friend(request):
         request (HttpRequest): The HttpRequest object containing the request data.
 
     Returns:
-        HttpResponseRedirect: Redirects to the user's notifications page after removing the friend.
+        HttpResponseRedirect: Redirects to the user's chats page after removing the friend.
 
     Notes:
         This view is only accessible to authenticated users.
     '''
-
+    
     if request.method == "POST":
-        # Get the user to be removed from the POST data
+        slug = request.POST.get("slug")
         try:
-            user_id = request.POST.get("user_id")
-            user = User.objects.get(id=user_id)
-            # Remove the user from the user's friends list
-            request.user.amigos.remove(user)
-            user.amigos.remove(request.user)
-            # Add a success message to be displayed on the next page
-            messages.add_message(request, constants.SUCCESS, f'"{user}" removido(a) da sua lista de amigos.')
+            user = User.objects.get(slug=slug)
+            if user in request.user.friends.all():
+                # Remove the user from the user's friends list
+                request.user.friends.remove(user)
+                user.friends.remove(request.user)
+                # Add a success message to be displayed on the next page
+                messages.add_message(request, constants.SUCCESS, f'"{user}" removido(a) da sua lista de amigos.')
+            else:
+                # If the user is not in the user's friends list, display an error message
+                messages.add_message(request, constants.ERROR, f'"{user}" não está na sua lista de amigos.')
+            # Redirects to the user's chats page after removing the friend
+            return HttpResponseRedirect(reverse("chat:chats"))
         except User.DoesNotExist:
             # If the user does not exist, add an error message to be displayed on the next page
             messages.add_message(request, constants.ERROR, 'Usuário não encontrado.')
-            # Redirects to the user's profile page after removing the friend
-            return HttpResponseRedirect(reverse("user:profile"))
-    
-    # Redirects to the user's profile page if the request method is not POST
-    return HttpResponseRedirect(reverse("user:profile"))
+            # Redirects to the user's chats page after removing the friend
+            return HttpResponseRedirect(reverse("chat:chats"))
+    return HttpResponseRedirect(reverse("chat:chats"))

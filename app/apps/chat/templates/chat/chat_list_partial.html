@@ -1,0 +1,53 @@
+{% load static %}
+{% load custom_tags %}
+
+<a href="{% url 'chat:chat' chat_dict.chat.id %}" class="list-group-item list-group-item-action">
+    <div class="chat-info">
+        <div class="chat-user-photo">
+            {% if photo_visibility  %}
+                <img id="user-photo" class="rounded-circle d-flex align-self-start me-3 shadow-1-strong {{online_visibility}}" src="{{ chat_dict.another_user.photo.url }}" alt="{{ chat_dict.another_user.photo.name }}">
+            {% else %}
+                <img id="user-photo" class="rounded-circle d-flex align-self-start me-3 shadow-1-strong {{online_visibility}}" src="{% static 'user/img/default_profile_photo.jpg' %}" alt="Sem foto de perfil">
+            {% endif %}
+        </div>
+        <div class="chat-username">
+            <span><strong>{{chat_dict.another_user.username}}</strong></span>
+        </div>
+        <div class="chat-date">
+            {% if chat_dict.last_message_date_is_today %}
+                <span><small><i id="chat-{{chat_dict.chat.id}}-date">{{chat_dict.last_message_date|time:"H:i"}}  <i class="fa fa-clock"></i></i></small></span>
+            {% else %}
+                <span><small><i id="chat-{{chat_dict.chat.id}}-date">{{chat_dict.last_message_date|date:"d/m/Y"}}  <i class="fa fa-clock"></i></i></small></span>
+            {% endif %}
+        </div>
+        <div class="chat-message">
+            {% if chat_dict.amount_of_messages > 0 %}
+                {% with chat_dict.last_message as last_message %}
+                    {% with last_message.message_type as message_type %}
+                        <span><strong id="chat-{{chat_dict.chat.id}}-author">{{last_message.author.username}}:</strong>
+                        {% if chat_dict.has_unread_messages %}
+                            <i><strong id="chat-{{chat_dict.chat.id}}-content" class="unviewed-message">{% if message_type == 'T' %}{{last_message.text|truncatechars:50|emoji_not_italic|safe}}
+                                    {% elif message_type == 'I' %}Foto  
+                                    {% elif message_type == 'V' %}Vídeo  
+                                    {% else %}Áudio{% endif %}</strong></i></span>
+                        {% else %}
+                            <i><small id="chat-{{chat_dict.chat.id}}-content">{% if message_type == 'T' %}{{last_message.text|truncatechars:50}}
+                                    {% elif message_type == 'I' %}Foto  
+                                    {% elif message_type == 'V' %}Vídeo  
+                                    {% else %}Áudio{% endif %}</small></i></span>
+                        {% endif %}
+                    {% endwith %}
+                {% endwith %}  
+            {% else %}
+                <span><i id="chat-{{chat_dict.chat.id}}-content">Nenhuma mensagem</i></span>
+            {% endif %}                      
+        </div>
+        <div class="chat-message-count">
+            {% if chat_dict.has_unread_messages %}
+                <span class="badge bg-primary rounded-pill" style="visibility: visible;" id="chat-{{chat_dict.chat.id}}-count">{{chat_dict.amount_of_unviewed_messages}}</span>
+            {% else %}
+                <span class="badge bg-primary rounded-pill" style="visibility: hidden;" id="chat-{{chat_dict.chat.id}}-count">0</span>
+            {% endif %}
+        </div>
+    </div>
+</a> 

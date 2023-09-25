@@ -32,3 +32,8 @@ if (settings.DEBUG):
     urlpatterns = [
         path('__debug__/', include('debug_toolbar.urls')),
     ] + urlpatterns
+
+
+admin.site.site_header = 'Administração Telezap'
+admin.site.index_title = 'Gerenciar entidades do Telezap'
+admin.site.site_title = 'Seja bem vindo a pagina de Administração do Telezap'

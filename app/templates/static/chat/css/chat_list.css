@@ -1,0 +1,138 @@
+.user-friend {
+    display: grid;
+    grid-template-columns: 0.35fr 1fr 0.5fr;
+    grid-template-rows: 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "friends-photos friends-usernames friends-btns";
+}
+
+.friends-photos {
+    grid-area: friends-photos;
+    display: flex; 
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.friends-usernames {
+    grid-area: friends-usernames;
+    display: flex; 
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: auto;
+    white-space: nowrap;
+
+}
+
+.friends-btns {
+    grid-area: friends-btns;
+    display: flex; 
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.unviewed-message {
+    color: azure;
+}
+
+
+.chat-info {  
+    display: grid;
+    grid-template-columns: 0.35fr 1fr 0.5fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "chat-user-photo chat-username chat-date"
+      "chat-user-photo chat-message chat-message-count";
+}
+
+.list-group-item {
+    padding: 1em!important;
+}
+
+.chat-user-photo {
+    grid-area: chat-user-photo;
+}
+
+#user-photo {
+    width: 80px;
+    height: 80px;
+}
+
+.chat-username { 
+    grid-area: chat-username; 
+    font-size: larger;
+}
+
+.chat-date { 
+    grid-area: chat-date;
+    align-content: end;
+}
+
+.chat-message { 
+    grid-area: chat-message;
+    overflow: hidden;
+    color: RGBA(var(--bs-secondary-rgb), 1);
+}
+
+.chat-message span {
+    display: inline-block;
+    max-width: -webkit-fill-available;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-right: 5px;
+}
+
+.chat-message-count { 
+    grid-area: chat-message-count;
+    align-content: end; 
+}
+
+.chat-username, .chat-message {
+    display: flex; 
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.chat-date, .chat-message-count {
+    display: flex; 
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.list-group-item:hover .chat-info {
+    transform: scale(1.01);
+}
+
+@media screen and (max-width: 600px) {
+    .chat-info {  
+        display: grid;
+        grid-template-columns: 0.5fr 1.5fr 0.5fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 0px 0px;
+        grid-auto-flow: row;
+        grid-template-areas:
+          "chat-user-photo chat-username chat-date"
+          "chat-user-photo chat-message chat-message-count";
+        font-size: smaller;
+    }
+
+    .chat-username { 
+        grid-area: chat-username; 
+        font-size: medium;
+    }
+
+    .chat-date { 
+        grid-area: chat-date;
+        align-content: end;
+        font-size: x-small;
+    }
+
+    #user-photo {
+        width: 50px;
+        height: 50px;
+    }
+}

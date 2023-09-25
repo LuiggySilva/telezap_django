@@ -1,0 +1,22 @@
+{% load static %}
+
+<div id="language-change-btn" class="dropdown bd-mode-toggle">
+  <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center btn-language-change-container" id="bd-language" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (dark)">
+    <span class="language-icon-active">🇧🇷</span>
+    <span class="visually-hidden" id="bd-language-text">Select Website Language</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-language-text">
+    <li><h6 class="dropdown-header">Select Website Language</h6></li>
+    <li><hr class="dropdown-divider"></li>
+    <li>
+      <button type="button" class="dropdown-item language-change-btn" data-bs-language-value="english" aria-pressed="true">
+        <span>🇺🇸 English</span>
+      </button>
+    </li>
+    <li>
+      <button type="button" class="dropdown-item language-change-btn active" data-bs-language-value="portuguese" aria-pressed="false">
+        <span>🇧🇷 Portuguese</span>
+      </button>
+    </li>
+  </ul>
+</div>

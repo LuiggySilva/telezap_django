@@ -10,12 +10,13 @@ class UserAdmin(admin.ModelAdmin):
 
     list_display = ('email', 'username', 'is_active', 'is_staff', 'is_superuser')
     search_fields = ('username', 'email')
+    readonly_fields = ('date_joined', 'last_login', 'slug', 'session_id', 'in_chat', 'in_groupchat')
 
-    filter_horizontal = ['friends', ]
+    filter_horizontal = ['friends',]
 
     fieldsets = (
         ('Perfil', {
-            'fields': ('username', 'slug', 'email', 'password', 'status', 'photo', 'friends'),
+            'fields': ('slug', 'username', 'email', 'password', 'status', 'photo', 'friends', 'session_id', 'in_chat', 'in_groupchat'),
         }),
         ('Configurações: Quem pode ver os dados pessoais', {
             'fields': (
@@ -33,6 +34,7 @@ class UserAdmin(admin.ModelAdmin):
                 'is_active',
                 'is_superuser',
                 'date_joined',
+                'last_login',
                 'user_permissions',
                 'groups',
             ),

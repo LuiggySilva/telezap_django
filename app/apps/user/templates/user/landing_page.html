@@ -13,6 +13,11 @@
 
 {% block body %}
     <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
         <img id="telezap-logo" src="{% static 'base/img/icon.svg' %}" width="100" height="100" alt="telezap-logo">
         <h1>Telezap</h1>
         <br>

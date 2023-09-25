@@ -21,7 +21,7 @@ class NotificationsViewTests(TestCase):
 
     def test_notifications_view_with_get_method(self):
         '''
-        Desciption:
+        Description:
             This test verifies the notifications view response with the GET method.
             
         Preconditions:
@@ -46,7 +46,7 @@ class NotificationsViewTests(TestCase):
 
     def test_notifications_view_with_post_method(self):
         '''
-        Desciption:
+        Description:
             This test verifies the notifications view response with the POST method.
 
         Preconditions:
@@ -74,7 +74,7 @@ class NotificationsViewTests(TestCase):
 
     def test_notifications_view_with_post_method_with_not_found_user(self):
         '''
-        Desciption:
+        Description:
             This test verifies the notifications view response with the POST method and an invalid user email.
 
         Preconditions:
@@ -103,7 +103,7 @@ class NotificationsViewTests(TestCase):
     
     def test_notifications_view_with_post_method_with_self_email(self):
         '''
-        Desciption:
+        Description:
             This test verifies the notifications view response with the POST method and the user's own email.
 
         Preconditions:
@@ -155,7 +155,7 @@ class NotificationReplyViewTests(TestCase):
 
     def test_reply_notification_view_accept(self):
         '''
-        Desciption:
+        Description:
             This test verifies the reply notification view response with the POST method and accept a friend request.
 
         Preconditions:
@@ -207,7 +207,7 @@ class NotificationReplyViewTests(TestCase):
 
     def test_reply_notification_view_reject(self):
         '''
-        Desciption:
+        Description:
             This test verifies the reply notification view response with the POST method and reject a friend request.
 
         Preconditions:
@@ -249,7 +249,7 @@ class NotificationReplyViewTests(TestCase):
 
     def test_reply_notification_view_inexistent(self):
         '''
-        Desciption:
+        Description:
             This test verifies the reply notification view response with the POST method and an inexistent notification id.
 
         Preconditions:
@@ -283,7 +283,7 @@ class NotificationReplyViewTests(TestCase):
 
     def test_reply_notification_view_unauthorized(self):
         '''
-        Desciption:
+        Description:
             This test verifies the reply notification view response with the POST method and try to reply a friend request that is not his.
 
         Preconditions:
@@ -343,7 +343,7 @@ class RemoveNotificationsVisibilityTests(TestCase):
     
     def test_remove_notifications_visibility_view_friends_reply(self):
         '''
-        Desciption:
+        Description:
             This test verifies the remove notifications visibility view response with the POST method and remove the visibility of a friend request.
 
         Preconditions:
@@ -420,7 +420,7 @@ class SendFriendRequestTest(TestCase):
 
     def test_send_friend_request_view(self):
         '''
-        Desciption:
+        Description:
             This test verifies the send friend request view response with the POST method and send a friendship request.
 
         Preconditions:

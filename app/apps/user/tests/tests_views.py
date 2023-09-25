@@ -1,15 +1,37 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.messages import get_messages
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.db.models.signals import pre_save
+
+from apps.user.signals import user_logged_out_callback, user_logged_in_callback
 from .factories import UserFactory, User
+import os
+
+
+# Desabilita os signals de login e logout para que os testes não sejam afetados
+user_logged_in.disconnect(user_logged_in_callback)
+user_logged_out.disconnect(user_logged_out_callback)
+
+
+def tearDown():
+    User = get_user_model()
+    for user in User.objects.all():
+        if user.photo:
+            os.remove(user.photo.path)
 
 
 class LoginViewTests(TestCase):
     def setUp(self):
         self.login_url = reverse('login')
-        self.username = 'testuser'
-        self.password = 'testpassword'
-        self.user = UserFactory(username=self.username, password=self.password)
+        self.redirect_url = reverse('user:landing_page')
+
+        self.username = "Test User"
+        self.password = "Test@Password123"
+        self.user = UserFactory(
+            username=self.username,
+            password=self.password,
+        )
 
 
     def test_login_success(self):
@@ -25,15 +47,16 @@ class LoginViewTests(TestCase):
             - The user must be logged in correctly.
             - The user must be redirected to the home page after login.
         '''
-
+        
         response = self.client.post(
             self.login_url, 
             {
-                'username': self.username, 
+                'username': self.user.email, 
                 'password': self.password
             },
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, self.redirect_url)
 
 
     def test_login_failure(self):
@@ -53,17 +76,29 @@ class LoginViewTests(TestCase):
         response = self.client.post(
             self.login_url, 
             {
-                'username': self.username, 
+                'username': self.user.email, 
                 'password': 'wrongpassword'
-            }
+            },
+            follow=True
         )
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Por favor, entre com um Email  e senha corretos. Note que ambos os campos diferenciam maiúsculas e minúsculas.")
+        self.assertFalse(response.wsgi_request.user.is_authenticated)
 
 
 class LogoutViewTests(TestCase):
     def setUp(self):
+        self.login_url = reverse('login')
         self.logout_url = reverse('logout')
         self.redirect_url = reverse('user:landing_page')
+
+        self.username = "Test User"
+        self.password = "Test@Password123"
+        self.user = UserFactory(
+            username=self.username,
+            password=self.password,
+        )
+
 
     def test_logout_success(self):
         '''
@@ -80,10 +115,18 @@ class LogoutViewTests(TestCase):
             - The user must be redirected to the home page after logout.
         '''
 
-        response = self.client.get(self.logout_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, self.redirect_url)
-        
+        login_response = self.client.login(
+            username = self.user.email,
+            password =  self.password
+        )
+        self.assertTrue(login_response)
+
+        logout_response = self.client.get(self.logout_url)
+        self.assertEqual(logout_response.status_code, 302)
+        self.assertRedirects(logout_response, self.redirect_url)
+        self.assertFalse(logout_response.wsgi_request.user.is_authenticated)
+
+
 
 class SignupViewTests(TestCase):
     def setUp(self):
@@ -91,6 +134,7 @@ class SignupViewTests(TestCase):
         self.username = 'testuser'
         self.email = 'testuser@email.com'
         self.password = 'testpassword'
+
 
     def test_signup_success(self):
         '''
@@ -121,6 +165,7 @@ class SignupViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('login'))
         self.assertTrue(User.objects.filter(email=self.email).exists())
+
 
     def test_signup_failure_username(self):
         '''
@@ -212,10 +257,11 @@ class SignupViewTests(TestCase):
         self.assertFalse(User.objects.filter(email=self.email).exists())
 
 
+
 class ProfileViewTests(TestCase):
     def setUp(self):
         self.username = 'testuser'
-        self.password = 'testpassword'
+        self.password = 'Test@Password123'
         self.user = UserFactory(username=self.username, password=self.password)
         self.email = self.user.email
         self.profile_url = reverse('user:profile', kwargs={'slug': self.username})
@@ -237,7 +283,7 @@ class ProfileViewTests(TestCase):
             - The user profile must be displayed correctly.
         '''
 
-        self.client.login(username=self.email, password=self.password)
+        login = self.client.login(username=self.email, password=self.password)
         response = self.client.get(self.profile_url)
 
         self.assertEqual(response.status_code, 200)

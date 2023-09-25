@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+
+{% block title %}{{another_user.username}}{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'chat/css/chat.css' %}">
+    <script src="{% static 'chat/js/chat.js' %}" defer></script>
+{% endblock head %}
+
+{% block navbar %}
+    {% include 'navbar.html' with user_is_authenticated=request.user.is_authenticated opt=None slug=request.user.slug %}
+{% endblock navbar %}
+
+{% block body %}
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div id="load-more-messages" class="w-100 mt-2 mb-2 text-center btn-samller" style="display: none;">
+            <button id="load-more-messages-btn" type="button" class="btn btn-outline-secondary btn-sm">Carregar mais mensagens</button>
+        </div>
+        <div id="loading-messages" class="w-100 mt-2 mb-2 text-center" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div class="row">
+            <div id="messages" data-get-messages-url="{% url 'chat:get_chat_messages' chat.id %}">
+                <h2 id="empty-chat" style="display: none;" class="text-center">Nenhuma mensagem</h2>
+                <ul id="message-list" class="list-unstyled">
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <form action="{% url 'chat:new_chat_message' chat.id %}" method="POST" id="text-form">
+            {% csrf_token %}
+            <input type="hidden" name="chat_id" value="{{chat.id}}">
+            <input type="hidden" name="message_type" value="T">
+            <div class="input-group mb-3 mt-4">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle file-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
+                        <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                    </svg>
+                </button>
+                <div class="btn-group dropup">
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#send_image_form">
+                                <i class="fa fa-image"></i> Imagem
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item disabled" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                <i class="fa fa-music"></i> Áudio
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item disabled" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                <i class="fa fa-video"></i> Vídeo</a>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <textarea id="autoresizing-textarea" rows="1" name="text" class="form-control" placeholder="Mensagem..."></textarea>
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#emojis">
+                    &#128512;
+                </button>
+                <button id="text-form-submit-btn" class="btn btn-primary" type="submit" form="text-form">Enviar</button>
+            </div>
+        </form>
+    </div>
+
+
+    
+    <div class="modal fade" id="send_image_form" tabindex="-1" data-bs-backdrop="static" aria-labelledby="send_image_form" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="send_image_form_label">Enviar imagem</h1>
+                </div>
+                <div class="modal-body" style="overflow-y: unset">
+                    <form action="{% url 'chat:new_chat_message' chat.id %}" method="POST" id="image-form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="image-preview-container text-center">
+                            <div id="loading-image" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                            <img src="" alt="" id="image-preview" class="img-fluid" style="display: none;">
+                        </div>
+                        <div class="input-group-prepend text-center mt-3">
+                            <input type="hidden" name="chat_id" value="{{chat.id}}">
+                            <input type="hidden" name="message_type" value="I">
+                            <input type="file" required name="image" accept="image/*" id="id_image" class="form-control custom-image-input">
+                            <label class="btn btn-primary" for="id_image">Selecionar imagem</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="image-form-close" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button id="image-form-send" type="submit" class="btn btn-primary" data-bs-dismiss="modal" form="image-form">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="another_user_profile" tabindex="-1" data-bs-backdrop="static" aria-labelledby="another_user_profile" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="another_user_profile_label">{{another_user.username}}</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="overflow-y: unset">
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                        {% is_user_attribute_visible request_user=request.user message_author=another_user attribute='email' as email_visibility %}
+                        {% is_user_attribute_visible request_user=request.user message_author=another_user attribute='status' as status_visibility %}
+                        {% is_user_attribute_visible request_user=request.user message_author=another_user attribute='photo' as photo_visibility %}
+                        {% is_user_attribute_visible request_user=request.user message_author=another_user attribute='online' as online_visibility %}
+                        <div>
+                            {% if photo_visibility %}
+                                <img id="another-user-profile-photo" class="rounded-circle d-flex align-self-start me-3 shadow-1-strong {{online_visibility}}" src="{{ another_user.photo.url }}" alt="{{ another_user.photo.name }}">
+                            {% else %}
+                                <img id="another-user-profile-photo" class="rounded-circle d-flex align-self-start me-3 shadow-1-strong {{online_visibility}}" src="{% static 'user/img/default_profile_photo.jpg' %}" alt="Sem foto de perfil">
+                            {% endif %}
+                        </div>
+                        {% if email_visibility %}
+                            <small class="mt-3">{{another_user.email}}</small>
+                        {% endif %}
+                        {% if status_visibility %}
+                            <p id="another-user-status" class="mt-3 text-break">{{another_user.status}}</p>
+                        {% endif %}
+                        <div class="mt-3 btn-group" role="group" aria-label="Basic example">
+                            {% if not another_user_is_friend %}
+                                <button form="send_friend_request" type="submit" class="btn btn-sm btn-success"><i class="fas fa-user-plus"></i> Adicionar amigo</button>
+                                <form id="send_friend_request" action="{% url 'notification:send_friend_request' %}" method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="slug" value="{{another_user.slug}}">
+                                </form>
+                            {% endif %}
+                            <a href="#" class="btn btn-sm btn-info disabled"><i class="fas fa-phone-volume"></i> Fazer ligação </a>
+                            <a href="{% url 'chat:remove_chat' chat.id %}" class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i> Apagar conversa</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="emojis" tabindex="-1" data-bs-backdrop="static" aria-labelledby="emojis" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="emojis_label">Emojis</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="overflow-y: unset">
+                    {% include 'emojis.html' with emojis=emojis user=request.user %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock body %}

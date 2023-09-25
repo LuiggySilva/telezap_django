@@ -1,0 +1,51 @@
+{% load static %}
+{% load custom_tags %}
+
+<a href="" class="another-user-profile-btn" data-bs-toggle="modal" data-bs-target="#another_user_profile">
+    {% if message.author.photo and visibility_photo %}
+        <img width="60" class="rounded-circle d-flex align-self-start me-3 shadow-1-strong {{visibility_online}}" src="{{ message.author.photo.url }}" alt="{{ user.photo.name }}">
+    {% else %}
+        <img width="60" class="rounded-circle d-flex align-self-start me-3 shadow-1-strong {{visibility_online}}" src="{% static 'user/img/default_profile_photo.jpg' %}" alt="Sem foto de perfil">
+    {% endif %}
+</a>
+<div class="card w-100">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <p class="fw-bold mb-0 message-author">{{message.author.username}}</p>
+        <p class="text-muted small mb-0 message-date">
+            {% if message.date|date_is_today %}
+                {{message.date|time:"H:i"}}
+            {% else %}
+                {{message.date|date:"d/m/Y"}}
+            {% endif %}
+            <i class="fa fa-clock"></i> 
+        </p>
+    </div>
+    <div class="card-body {% if message.message_type == "I" %}center-image{% endif %}">
+        {% if message.message_type == "T" %}
+            <p class="mb-0 text-break">{{message.text}}</p>
+        {% elif message.message_type == "I" %}
+            <a href="" class="image-message" data-bs-toggle="modal" data-bs-target="#full-image-{{message.id}}">
+                <img src="{{message.image.url}}" alt="{{message.image.name}}" class="img-fluid">
+            </a>
+            <div class="modal fade" id="full-image-{{message.id}}" tabindex="-1" data-bs-backdrop="static" aria-labelledby="full-image-{{message.id}}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="full-image-{{message.id}}-label">Imagem</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" style="overflow-y: unset">
+                            <div class="d-flex flex-column align-items-center justify-content-center">
+                                <img width="100%" src="{{message.image.url}}" alt="{{message.image.name}}" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% elif message.message_type == "V" %}
+            <p class="mb-0 text-break">Vídeo</p>
+        {% else %}
+            <p class="mb-0 text-break">Áudio</p>
+        {% endif %}
+    </div>
+</div>

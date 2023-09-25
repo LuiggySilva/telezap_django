@@ -1,0 +1,20 @@
+{% load static %}
+
+<ul class="nav nav-tabs justify-content-center nav-emojis" id="myTab" role="tablist">
+    {% for categoria, data in emojis.items %}
+        <li class="nav-item" role="presentation">
+            <a title={{categoria}} class="emoji-nav-link nav-link{% if forloop.first %} active{% endif %}" id="{{ categoria|slugify }}-tab" data-bs-toggle="tab" href="#{{ categoria|slugify }}" role="tab" aria-controls="{{ categoria|slugify }}" aria-selected="{{ forloop.first }}">{{ data.icon|safe }}</a>
+        </li>
+    {% endfor %}
+</ul>
+<div class="tab-content mt-2" id="myTabContent">
+    {% for categoria, data in emojis.items %}
+        <div class="tab-pane fade{% if forloop.first %} show active{% endif %}" id="{{ categoria|slugify }}" role="tabpanel" aria-labelledby="{{ categoria|slugify }}-tab">
+            <div class="emoji-list">
+                {% for emoji in data.emojis %}
+                    <span class="emoji-icon">{{ emoji|safe }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

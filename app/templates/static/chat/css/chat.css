@@ -1,0 +1,186 @@
+
+#user-title {  
+    display: grid;
+    grid-template-columns: 0.1fr 1fr;
+    grid-template-rows: 0.5fr 0.5fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "user-photo-title user-username-title"
+      "user-photo-title user-email-title";
+}
+
+#user-photo-title {
+    grid-area: user-photo-title;
+    align-self: center;
+    justify-self: flex-start;
+}
+
+#user-photo-title img {
+    width: 70px;
+}
+
+#user-username-title {
+    grid-area: user-username-title;
+    align-self: center;
+    justify-self: flex-start;
+    font-size: x-large;
+}
+
+#user-email-title {
+    grid-area: user-email-title;
+    align-self: center;
+    justify-self: flex-start;
+    font-size: large;
+}
+
+#autoresizing-textarea {
+    overflow: hidden;
+    resize: none;
+}
+
+#messages {
+    overflow-y: scroll;
+    max-height: 725px;
+    scroll-snap-align: end;
+}
+
+
+.image-message {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.dropdown-item:hover {
+    background-color: RGBA(var(--bs-secondary-rgb), 0.5);
+}
+
+.file-dropdown::after {
+    display: none!important;
+}
+
+.custom-image-input {
+    opacity: 0!important;
+    position: absolute!important; 
+    z-index: -1!important; 
+}
+
+.another-user-profile-btn img:hover {
+    transform: scale(1.1)!important;
+}
+
+#image-form {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+}
+
+.image-preview-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    width: 80%;
+}
+
+#another-user-profile-photo {
+    width: 250px;
+}
+
+#another-user-status {
+    border: 1px solid var(--bs-modal-color);
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+}
+
+.emoji-list {
+    grid-template-columns: repeat(9, 1fr)!important;
+}
+
+.image-message {
+    max-width: 50%!important;
+}
+
+.center-image {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+}
+
+#last-unviewed-message:focus {
+    outline: none;
+}
+
+#last-unviewed-message .card {
+    transition: transform 0.3s ease;
+}
+
+#last-unviewed-message:focus .card {
+    outline: none;
+    transform: scale(1.01);
+    box-shadow: 5px 5px 5px 0px var(--bs-border-color);
+} 
+
+
+@media screen and (max-width: 600px) {
+    #user-username-title {
+        font-size: medium;
+    }
+
+    .message-author {
+        font-size: small;
+    }
+
+    .message-date {
+        font-size: x-small;
+    }
+
+    .emoji-list {
+        grid-template-columns: repeat(6, 1fr)!important;
+    }
+
+    #user-email-title {
+        grid-area: user-email-title;
+        align-self: center;
+        justify-self: flex-start;
+        font-size: small;
+        overflow-x: scroll;
+        white-space: nowrap;
+        width: -webkit-fill-available;
+    }
+    
+    #user-photo-title img {
+        width: 60px;
+    }
+
+    #messages {
+        overflow-y: scroll;
+        max-height: 390px;
+    }
+
+    #another-user-profile-photo {
+        width: 150px;
+    }
+
+    .image-message {
+        max-width: 70%!important;
+    }
+
+    #last-unviewed-message:focus .card {
+        outline: none;
+        transform: scale(1.05);
+        box-shadow: 5px 5px 5px 0px var(--bs-border-color);
+    }
+
+}

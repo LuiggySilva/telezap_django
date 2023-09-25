@@ -23,16 +23,11 @@ class NotificationAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        
-        author_view = cleaned_data.get("author_view")
-        receiver_view = cleaned_data.get("receiver_view")
-        if author_view == False and receiver_view == False:
-            self.add_error("author_view", "Não é possível criar uma notificação com visualização author e receiver como False.")
-            self.add_error("receiver_view", "Não é possível criar uma notificação com visualização author e receiver como False.")
 
         author = cleaned_data.get("author")
         receiver = cleaned_data.get("receiver")
-        if author == receiver:
+        id = cleaned_data.get("id")
+        if GroupRequest.objects.filter(id=id, author=author, receiver=receiver).exists():
             self.add_error("author", "Não é possível criar uma notificação com author e receiver iguais.")
             self.add_error("receiver", "Não é possível criar uma notificação com author e receiver iguais.")
 
@@ -55,8 +50,9 @@ class FriendshipRequestAdminForm(NotificationAdminForm):
         cleaned_data = super().clean()
         author = cleaned_data.get("author")
         receiver = cleaned_data.get("receiver")
+        id = cleaned_data.get("id")
 
-        if FriendshipRequest.objects.filter(author=author, receiver=receiver).exists():
+        if FriendshipRequest.objects.filter(id=id, author=author, receiver=receiver).exists():
             self.add_error("author", "Uma solicitação de amizade já foi enviada para esse usuário.")
             self.add_error("receiver", "Uma solicitação de amizade já foi enviada para esse usuário.")
 
@@ -80,8 +76,9 @@ class GroupRequestAdminForm(NotificationAdminForm):
         cleaned_data = super().clean()
         author = cleaned_data.get("author")
         receiver = cleaned_data.get("receiver")
+        id = cleaned_data.get("id")
 
-        if GroupRequest.objects.filter(author=author, receiver=receiver).exists():
+        if GroupRequest.objects.filter(id=id, author=author, receiver=receiver).exists():
             self.add_error("author", "Uma solicitação de grupo já foi enviada para esse usuário.")
             self.add_error("receiver", "Uma solicitação de grupo já foi enviada para esse usuário.")
 

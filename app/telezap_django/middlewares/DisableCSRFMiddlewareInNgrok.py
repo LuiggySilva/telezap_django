@@ -2,6 +2,10 @@ from django.conf import settings
 from django.middleware.csrf import get_token
 
 class DisableCSRFMiddlewareInNgrok:
+    '''
+    Middleware to disable CSRF check in ngrok 
+    '''
+
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -14,7 +18,7 @@ class DisableCSRFMiddlewareInNgrok:
 
             setattr(request, '_dont_enforce_csrf_checks', True)
         else:
-            # Garante que o token CSRF ainda seja definido para outras solicitações
+            # Ensure CSRF token is still set for other requests
             get_token(request)  
 
         response = self.get_response(request)

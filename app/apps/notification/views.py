@@ -16,7 +16,10 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.messages import constants
 from django.contrib.auth import get_user_model
+
 from .models import FriendshipRequest, GroupRequest
+from apps.chat.models import Chat
+import json
 
 User = get_user_model()
 
@@ -46,6 +49,18 @@ def notifications(request):
         - If the method is POST the view will search for a user with the email passed in the search form.
         - If the method is POST and the user is found, the user will be added to the context.
         - If the method is GET the view will render the notifications page.
+    '''
+
+    '''
+        self.META = {
+            "REQUEST_METHOD": self.method,
+            "QUERY_STRING": query_string,
+            "SCRIPT_NAME": self.script_name,
+            "PATH_INFO": self.path_info,
+            # WSGI-expecting code will need these for a while
+            "wsgi.multithread": True,
+            "wsgi.multiprocess": True,
+        }
     '''
 
     # Get friend requests sent by the user with your visualization as True ordered by date
@@ -146,8 +161,16 @@ def reply_notification_request(request):
                 # Update the notification visualization to False
                 notification.receiver_view = False
                 notification.save()
+                # Create a chat between the users
+                if (not Chat.objects.filter(
+                        Q(user1=notification.author, user2=notification.receiver) | Q(user1=notification.receiver, user2=notification.author)
+                   ).exists()):
+                    Chat.objects.create(user1=notification.author, user2=notification.receiver)
                 # Add a success message to the context
-                messages.add_message(request, constants.SUCCESS, f'{notification.author} agora é seu amigo(a)!')
+                if notification_type == "A":
+                    messages.add_message(request, constants.SUCCESS, f'{notification.author} agora é seu amigo(a)!')
+                else:
+                    messages.add_message(request, constants.SUCCESS, f'Você agora é membro do grupo {notification.group}!')
             else:
                 # Update the notification status to refused
                 notification.status = "R"
@@ -186,13 +209,25 @@ def remove_notifications_visibility(request):
         # Verify the type of notification
         if notification_type == "A":
             # Update the visibility of friendship notifications from the user to False
-            FriendshipRequest.objects.filter(author=request.user).exclude(status='P').update(author_view=False)
-            FriendshipRequest.objects.filter(receiver=request.user).exclude(status='P').update(receiver_view=False)
+            friend_requests = FriendshipRequest.objects.filter(author=request.user).exclude(status='P')
+            for friend_request in friend_requests:
+                friend_request.author_view = False
+                friend_request.save()
+            friend_requests = FriendshipRequest.objects.filter(receiver=request.user).exclude(status='P')
+            for friend_request in friend_requests:
+                friend_request.receiver_view = False
+                friend_request.save()
             messages.add_message(request, constants.SUCCESS, 'Notificações de amizade finalizadas removidas.')
         else:
             # Update the visibility of group notifications from the user to False
-            GroupRequest.objects.filter(author=request.user).exclude(status='P').update(author_view=False)
-            GroupRequest.objects.filter(receiver=request.user).exclude(status='P').update(receiver_view=False)
+            group_requests = GroupRequest.objects.filter(author=request.user).exclude(status='P')
+            for group_request in group_requests:
+                group_request.author_view = False
+                group_request.save()
+            group_requests = GroupRequest.objects.filter(receiver=request.user).exclude(status='P')
+            for group_request in group_requests:
+                group_request.receiver_view = False
+                group_request.save()
             messages.add_message(request, constants.SUCCESS, 'Notificações de grupo finalizadas removidas.')
         return HttpResponseRedirect(reverse("notification:notifications"))
 
@@ -223,10 +258,17 @@ def send_friend_request(request):
     if request.method == "POST":
         try:
             # Get the user with the email passed
-            user = User.objects.get(email=request.POST.get("email"))
+            error_var = ''
+            if 'email' in request.POST:
+                error_var = 'email'
+                user = User.objects.get(email=request.POST.get("email"))
+            elif 'slug' in request.POST:
+                error_var = 'slug'
+                user = User.objects.get(slug=request.POST.get("slug"))
+
         except User.DoesNotExist:
             # Return an error message if the user is not found
-            messages.add_message(request, constants.ERROR, "Nenhum usuário(a) com esse email foi encontrado.")
+            messages.add_message(request, constants.ERROR, f"Nenhum usuário(a) com esse {error_var} foi encontrado.")
             return HttpResponseRedirect(reverse("notification:notifications"))
         
         # Verify if the user is the logged in user

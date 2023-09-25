@@ -1,14 +1,12 @@
 from django.test import TestCase
-from .factories import UserFactory, User
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.db import transaction
 
+from .factories import UserFactory, User
+
+
 class UserModelTestCase(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-
-
     def test_str_method(self):
         '''
         Description:
@@ -23,7 +21,7 @@ class UserModelTestCase(TestCase):
         
         username = 'testuser'
         self.user = UserFactory(username=username)
-        self.assertEqual(str(self.user), username)
+        self.assertEqual(str(self.user), self.user.email)
 
 
     def test_username_validator(self):
@@ -93,12 +91,12 @@ class UserModelTestCase(TestCase):
             - The User model must raise an IntegrityError exception if the username already exists.
             - The user must not be created.
         '''
+        
+        user = UserFactory(username='myuser')
 
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
-                user1 = UserFactory(username='myuser')
-
-                user2 = UserFactory(username='myuser')
+                UserFactory(username='myuser')
 
         self.assertEqual(User.objects.count(), 1)
 
@@ -116,11 +114,11 @@ class UserModelTestCase(TestCase):
             - The user must not be created.
         '''
 
+        user = UserFactory(username='myuser1', email='myuser@email.com')
+        
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
-                user1 = UserFactory(username='myuser1', email='myuser@email.com')
-
-                user2 = UserFactory(username='myuser2', email='myuser@email.com')
+                UserFactory(username='myuser2', email='myuser@email.com')
 
         self.assertEqual(User.objects.count(), 1)
 
@@ -178,4 +176,3 @@ class UserModelTestCase(TestCase):
             ('AA', 'Apenas amigos'),
             ('NM', 'Ninguém'), 
         ))
-    

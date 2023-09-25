@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+
+{% block title %}Conversas{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'chat/css/chat_list.css' %}">
+    <script src="{% static 'chat/js/chat_list.js' %}" defer></script>
+{% endblock head %}
+
+{% block navbar %}
+    {% include 'navbar.html' with user_is_authenticated=request.user.is_authenticated opt="chat" slug=request.user.slug %}
+{% endblock navbar %}
+
+{% block body %}
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <div class="d-flex flex-row justify-content-between">
+            <div>
+                <h2>Conversas</h2>
+            </div>
+            <div>
+                <button type="button" class="btn btn-small btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#friend_list">
+                    <i class="bi bi-people-fill"></i> Amigos
+                </button>
+            </div>
+        </div>
+        <hr>
+        <div id="chat-list" class="list-group">
+            {% for chat_dict in chats %}
+
+                {% is_user_attribute_visible request_user=request.user message_author=chat_dict.another_user attribute='online' as online_visibility %}
+                {% is_user_attribute_visible request_user=request.user message_author=chat_dict.another_user attribute='photo' as photo_visibility %}    
+                {% include 'chat/chat_list_partial.html' with chat_dict=chat_dict online_visibility=online_visibility photo_visibility=photo_visibility%}
+
+            {% empty %}
+                <h3 id="empty-chat-list" class="text-center">Nenhuma conversa 😭</h3>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="modal fade" id="friend_list" tabindex="-1" data-bs-backdrop="static" aria-labelledby="friend_list" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="friend_list_label">Amigos</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="list-group">
+                        {% for friend in request.user.friends.all %}
+                            <div class="user-friend list-group-item">
+                                {% is_user_attribute_visible request_user=request.user message_author=friend attribute='online' as online_visibility %}
+                                {% is_user_attribute_visible request_user=request.user message_author=friend attribute='photo' as photo_visibility %}
+                                <div class="friends-photos">
+                                    {% if photo_visibility  %}
+                                    <img id="user-photo" class="rounded-circle d-flex align-self-start me-3 shadow-1-strong {{online_visibility}}" src="{{ friend.photo.url }}" alt="{{ friend.photo.name }}">
+                                    {% else %}
+                                    <img id="user-photo" class="rounded-circle d-flex align-self-start me-3 shadow-1-strong {{online_visibility}}" src="{% static 'user/img/default_profile_photo.jpg' %}" alt="Sem foto de perfil">
+                                    {% endif %}
+                                </div>
+                                <div class="friends-usernames">
+                                    <span><strong>{{friend.username}}</strong></span>
+                                </div>
+                                <div class="friends-btns btn-group" role="group" aria-label="Basic example">
+                                    {% with request.user|get_chat_id:friend as chat_id %}
+                                        <a href="{% url 'chat:chat' chat_id %}" title="Enviar mensagem" class="btn btn-success"><i class="fas fa-comments"></i></a>
+                                    {% endwith %}
+                                    <form id="remove_friend_form" action="{% url 'user:remove_friend' friend.slug %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="slug" value="{{friend.slug}}">
+                                    </form>
+                                    <button form="remove_friend_form" title="Desfazer amizade" type="submit" class="btn btn-danger"><i class="fas fa-user-times"></i></button>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <h3 class="text-center">Nenhum amigo 😭</h3>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock body %}

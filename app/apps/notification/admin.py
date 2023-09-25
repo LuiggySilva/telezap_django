@@ -10,6 +10,14 @@ class FriendshipRequestAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     form = FriendshipRequestAdminForm
 
+    def get_form(self, request, obj=None, **kwargs):
+        if obj is None:
+            self.readonly_fields = ()
+        else:
+            self.readonly_fields = ('author', 'receiver', 'group') 
+        return super().get_form(request, obj, **kwargs)
+
+
 @admin.register(GroupRequest)
 class GroupRequestAdmin(admin.ModelAdmin):
     form = GroupRequestAdminForm
@@ -17,4 +25,17 @@ class GroupRequestAdmin(admin.ModelAdmin):
     search_fields = ('author', 'receiver', 'group')
     list_filter = ('status',)
     form = GroupRequestAdminForm
+
+    fieldsets = (
+        ('Solicitação', {
+            'fields': ('author','author_view', 'receiver', 'receiver_view', 'group', 'status',),
+        }),
+    )
+
+    def get_form(self, request, obj=None, **kwargs):
+        if obj is None:
+            self.readonly_fields = ()
+        else:
+            self.readonly_fields = ('author', 'receiver', 'group') 
+        return super().get_form(request, obj, **kwargs)
     

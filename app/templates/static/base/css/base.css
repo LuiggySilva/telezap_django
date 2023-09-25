@@ -7,7 +7,11 @@ html, body {
   color: rgba(255, 0, 0, 0.541);
 }
 
-.theme-change-btn {
+.navbar a {
+  color: white;
+}
+
+.language-change-btn {
   display: flex!important;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -16,7 +20,7 @@ html, body {
   align-items: center;
 }
 
-.btn-theme-change-container {
+.btn-language-change-container {
   border: 1px solid var(--bs-light-text-emphasis);
 }
 
@@ -24,16 +28,25 @@ html, body {
   filter: hue-rotate(200deg);
 }
 
+.nav-emojis {
+  font-size: medium;
+}
+
+.emoji-list {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 5px;
+}
+
 .emoji-icon {
-  font-size: 1.5em;
   padding: 5px;
-  width: 30px;
-  height: 30px;
+  text-align: center;
+  user-select: none;
 }
 
 .emoji-icon:hover {
+  background-color: var(--bs-body-color);
   cursor: pointer;
-  background-color: rgba(var(--bs-body-color-rgb),.65);
 }
 
 .tab-content {
@@ -43,6 +56,11 @@ html, body {
   overflow-x: hidden;
 }
 
+.no-italic {
+  font-style: normal!important;
+  display: initial!important;
+}
+
 /* desktop */
 
 .nav-link-active {
@@ -50,6 +68,7 @@ html, body {
   -webkit-text-decoration-color: RGBA(var(--bs-secondary-rgb),1)!important;
   text-decoration-color: RGBA(var(--bs-secondary-rgb),1)!important;
   text-decoration: underline!important;
+  text-decoration-skip-ink: auto;
 }
 
 .nav-link-active:hover {
@@ -58,6 +77,7 @@ html, body {
 
 .nav-link:hover {
   text-decoration: underline!important;
+  text-decoration-skip-ink: auto;
 }
 
 .nav-bar-icon {
@@ -66,6 +86,7 @@ html, body {
 
 .emoji-nav-link:hover {
   text-decoration: none!important;
+  text-decoration-skip-ink: auto;
 }
 
 #telezap-logo {
@@ -79,12 +100,12 @@ html, body {
   margin-right: 10px;
 }
 
-#theme-change-btn {
+#language-change-btn {
   position: fixed;
   bottom: 0;
   right: 0; 
-  margin-bottom: 1rem; 
-  margin-right: 1rem;
+  margin-bottom: 0.5rem; 
+  margin-right: 0.5rem;
   z-index: 100;
 }
 
@@ -112,6 +133,18 @@ html, body {
   animation: blinking 1s infinite; /* Aplica a animação "blinking" infinitamente */
 }
 
+.online-status {
+  border: 2px solid green;
+}
+
+.offline-status {
+  border: 2px solid red;
+}
+
+.nobody-status {
+  border: 2px solid black;
+}
+
 
 /* mobile */
 @media (max-width: 768px) {
@@ -126,34 +159,31 @@ html, body {
   }
 
   .nav-emojis {
-    font-size: x-small!important;
-    display: flex!important;
-    flex-direction: row!important;
-    align-items: center!important;
-    flex-wrap: nowrap!important;
+    font-size: small;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    user-select: none;
   }
 
   .emoji-list {
-    text-align: center;
-    padding-right: 5px;
+    grid-template-columns: repeat(6, 1fr);
   }
 
   .emoji-icon {
-    width: 20px!important;
-    height: 20px!important;
-    font-size: 1.5em;
-    padding: 5px;
+    font-size: 1em;
   }
 
-  #theme-change-btn {
+  #language-change-btn {
     position: fixed;
     top: 0;
     left: 0;
-    margin-top: 1rem; 
-    margin-left: 1rem;
+    margin-top: 0.5rem; 
+    margin-left: 0.5rem;
     z-index: 100;
-    width: 75px;
-    height: 42px;
+    width: 70px;
+    height: 40px;
   }
 
   .navbar {

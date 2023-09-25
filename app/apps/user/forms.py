@@ -2,7 +2,12 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, UsernameField
 
+from PIL import Image
+
 User = get_user_model()
+MIN_ASPECT_RATIO = 0.75  # Proporção mínima (largura / altura)
+MAX_ASPECT_RATIO = 1.75  # Proporção máxima (largura / altura)
+
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -53,6 +58,17 @@ class UserProfileForm(forms.ModelForm):
                 }
             ),
         }
+
+    def clean_photo(self):
+        photo = self.cleaned_data.get('photo')
+        
+        if photo:
+            photo_file = Image.open(photo)
+            width, height = photo_file.width, photo_file.height
+            aspect_ratio = width / height
+            if aspect_ratio < MIN_ASPECT_RATIO or aspect_ratio > MAX_ASPECT_RATIO:
+                self.add_error('photo', "A proporção da imagem deve ser aproximadamente quadrada")
+        return photo
 
 
 
@@ -117,4 +133,14 @@ class UserAdminForm(forms.ModelForm):
             self.add_error('friends', "Você não pode adicionar a si mesmo como amigo.")
         return friends
 
+    def clean_photo(self):
+        photo = self.cleaned_data.get('photo')
+
+        if photo:
+            photo_file = Image.open(photo)
+            width, height = photo_file.width, photo_file.height
+            aspect_ratio = width / height
+            if aspect_ratio < MIN_ASPECT_RATIO or aspect_ratio > MAX_ASPECT_RATIO:
+                self.add_error('photo', "A proporção da imagem deve ser aproximadamente quadrada")
+        return photo
 

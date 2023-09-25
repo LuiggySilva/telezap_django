@@ -4,7 +4,11 @@ from django.db.models import signals
 from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-import string, emoji
+from django.conf import settings
+from django.contrib.sessions.models import Session
+
+import string, emoji, os
+
 
 class CustomUserManager(BaseUserManager):
     """
@@ -48,7 +52,11 @@ class User(AbstractUser):
     email = models.EmailField(_('Email'), unique=True)
     slug = models.SlugField(max_length=100, unique=True, verbose_name="Slug")
     status = models.TextField(max_length=250, blank=True, verbose_name="Status")
-    photo = models.ImageField(upload_to='user_profiles_photos', blank=True, verbose_name="Foto")
+    photo = models.ImageField(
+        upload_to='user_profiles_photos',
+        verbose_name="Foto",
+        blank=True,
+    )
     friends = models.ManyToManyField('self', blank=True, symmetrical=True, verbose_name='Amigos')
 
     profile_visibility_types = (
@@ -82,6 +90,10 @@ class User(AbstractUser):
         verbose_name="Visibilidade do online"
     )
 
+    session_id = models.CharField(max_length=100, blank=True, null=True, verbose_name="ID da sessão")
+    in_chat = models.CharField(max_length=1000, blank=True, null=True, verbose_name="Ativo agora no(s) Chat(s)")
+    in_groupchat = models.CharField(max_length=1000, blank=True, null=True, verbose_name="Ativo agora no(s) Grupo(s)")
+
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -89,11 +101,23 @@ class User(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return f"{self.username}"
+        return f"{self.email}"
+
+
+    def is_online(self):
+        if Session.objects.filter(session_key=self.session_id).exists():
+            return True
+        else:
+            User.objects.filter(email=self.email).update(session_id=None)
+            return False
+
+
+    def is_friend(self, user):
+        return user in self.friends.all()
 
 
     def have_pending_notifications(self):
-        from apps.util import user_has_pending_notifications 
+        from apps.utils import user_has_pending_notifications 
         return user_has_pending_notifications(self)
 
 
@@ -102,6 +126,6 @@ class User(AbstractUser):
         return False
 
 
-    #TODO: Implementar
-    def have_pending_chat_messages(self):
-        return False
+    def user_has_unviewed_chat_messages(self):
+        from apps.utils import user_has_unviewed_chat_messages
+        return user_has_unviewed_chat_messages(self)

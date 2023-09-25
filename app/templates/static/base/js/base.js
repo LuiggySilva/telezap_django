@@ -1,86 +1,118 @@
-/*!
- * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)
- * Copyright 2011-2023 The Bootstrap Authors
- * Licensed under the Creative Commons Attribution 3.0 Unported License.
- */
+
+// Function to connect to the websocket
+function navbarWebSocketConnect() {
+  // Verify if the protocol is https or http and set the websocket protocol accordingly
+  var websocketProtocol = "ws://";
+  if (window.location.protocol === 'https:') {
+      websocketProtocol = "wss://";
+  }
+  const socket = new WebSocket(websocketProtocol + window.location.host + '/ws/navbar/');
+
+  // When the websocket is connected, log it to the console
+  socket.onopen = function(event) {
+      console.log('WebSocket (navbar) is connected.');
+  };
+
+  // When the websocket is closed, try to reconnect in 2 seconds
+  socket.onclose = function(event) {
+      setTimeout(function() {
+          console.error("WebSocket (navbar) connection closed unexpectedly, trying to reconnect in 2 seconds...");
+          connect()
+      }, 2000);
+  };
+
+  // When the websocket receives a message, parse it and update the chat list
+  socket.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      const type = data['type'];
+      const value = data['value'];
+
+      const elements = {
+          'navbar_chat_unviewed_messages': "nav-chats",
+          'navbar_notification_pending_notifications': "nav-notifications",
+          'navbar_groupchat_unviewed_messages': "nav-group",
+      }
+
+      const element = document.getElementById(elements[type]);
+      if (value == true) {
+          element.setAttribute("class", "blinking-text");
+      } else {
+          element.removeAttribute("class");
+      }
+      
+  };
+
+};
 
 (() => {
-    'use strict'
+    'use strict';
+
+    const getStoredLanguage = () => localStorage.getItem('language');
+    const setStoredLanguage = language => localStorage.setItem('language', language);
   
-    const getStoredTheme = () => localStorage.getItem('theme')
-    const setStoredTheme = theme => localStorage.setItem('theme', theme)
-  
-    const getPreferredTheme = () => {
-      const storedTheme = getStoredTheme()
-      if (storedTheme) {
-        return storedTheme
+    const getPreferredLanguage = () => {
+      const storedLanguage = getStoredLanguage()
+      if (storedLanguage) {
+        return storedLanguage;
       }
-  
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      return window.matchMedia('(prefers-language-scheme: portuguese)').matches ? 'portuguese' : 'english';
     }
   
-    const setTheme = theme => {
-      if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-bs-theme', 'dark')
+    const setLanguage = language => {
+      if (language === 'auto' && window.matchMedia('(prefers-language-scheme: portuguese)').matches) {
+        document.documentElement.setAttribute('data-bs-language', 'portuguese');
       } else {
-        document.documentElement.setAttribute('data-bs-theme', theme)
+        document.documentElement.setAttribute('data-bs-language', language);
       }
     }
   
-    setTheme(getPreferredTheme())
+    setLanguage(getPreferredLanguage())
   
-    const showActiveTheme = (theme, focus = false) => {
-      const themeSwitcher = document.querySelector('#bd-theme');
-  
-      if (!themeSwitcher) {
+    const showActiveLanguage = (language, focus = false) => {
+      const languageSwitcher = document.querySelector('#bd-language');
+      if (!languageSwitcher) {
         return
       }
   
-      const themeSwitcherText = document.querySelector('#bd-theme-text')
-      const activeThemeIcon = document.querySelector('.theme-icon-active use')
-      const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
-      const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
+      const languageSwitcherText = document.querySelector('#bd-language-text');
+      const activeLanguageIcon = document.querySelector('.language-icon-active');
+      const btnToActive = document.querySelector(`[data-bs-language-value="${language}"]`);
   
-      document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-        element.classList.remove('active')
-        element.setAttribute('aria-pressed', 'false')
+      document.querySelectorAll('[data-bs-language-value]').forEach(element => {
+        element.classList.remove('active');
+        element.setAttribute('aria-pressed', 'false');
       })
   
-      btnToActive.classList.add('active')
-      btnToActive.setAttribute('aria-pressed', 'true')
-      activeThemeIcon.setAttribute('href', svgOfActiveBtn)
-      const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
-      themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
-  
-      if (focus) {
-        themeSwitcher.focus()
+      btnToActive.classList.add('active');
+      btnToActive.setAttribute('aria-pressed', 'true');
+      if (language === 'portuguese') {
+        activeLanguageIcon.innerText = "🇧🇷";
+      } else {
+        activeLanguageIcon.innerText = "🇺🇸";
       }
-
-      var activeImg = document.querySelector("#active-theme");
-      var activeTheme = document.querySelector(".active");
-      activeImg.setAttribute('src', activeTheme.getAttribute('data-url'));
-
     }
   
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      const storedTheme = getStoredTheme()
-      if (storedTheme !== 'light' && storedTheme !== 'dark') {
-        setTheme(getPreferredTheme())
+    window.matchMedia('(prefers-language-scheme: portuguese)').addEventListener('change', () => {
+      const storedLanguage = getStoredLanguage();
+      if (storedLanguage !== 'english' && storedLanguage !== 'portuguese') {
+        setLanguage(getPreferredLanguage());
       }
     })
   
     window.addEventListener('DOMContentLoaded', () => {
-      showActiveTheme(getPreferredTheme())
+      showActiveLanguage(getPreferredLanguage());
   
-      document.querySelectorAll('[data-bs-theme-value]')
+      document.querySelectorAll('[data-bs-language-value]')
         .forEach(toggle => {
           toggle.addEventListener('click', () => {
-            const theme = toggle.getAttribute('data-bs-theme-value')
-            setStoredTheme(theme)
-            setTheme(theme)
-            showActiveTheme(theme, true)
+            const language = toggle.getAttribute('data-bs-language-value');
+            setStoredLanguage(language);
+            setLanguage(language);
+            showActiveLanguage(language, true);
           })
-        })
+      });
+
+      navbarWebSocketConnect();
     });
 
   })();

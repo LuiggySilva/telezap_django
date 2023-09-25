@@ -19,7 +19,7 @@
                 <div class="alert {{ message.tags }}">{{ message }}</div>
             {% endfor %}
         {% endif %}
-        <h2>Enviar solicitação de amizade</h2>
+        <h2 class="text-center">Enviar solicitação de amizade</h2>
         <form action="{% url 'notification:notifications' %}" method="POST">
             {% csrf_token %}
             <div class="input-group">
@@ -34,22 +34,29 @@
                     <input type="hidden" name="email" value="{{user_search_result.email}}">
                     <div class="list-group list-group-flush border-bottom scrollarea">
                         <div class="list-group-item list-group-item-action py-3 lh-sm" aria-current="true">
-                            <div class="d-flex w-100 align-items-center justify-content-between">
-                                {% if user_search_result.photo %}
+                            <div class="d-flex flex-column w-100 align-items-center justify-content-between">
+                                <div class="p-1">
+                                    {% if user_search_result.photo %}
                                     <img id="user-photo" src="{{ user_search_result.photo.url }}" alt="{{ user_search_result.photo.name }}">
-                                {% else %}
+                                    {% else %}
                                     <img id="user-photo" src="{% static 'base/img/profile-photo.jpg' %}" alt="Sem foto de perfil">
-                                {% endif %}
-                                <strong class="mb-1">{{ user_search_result.username }}</strong>
-                                <small>{{ user_search_result.email }}</small>
-                                <button type="submit" class="btn btn-success rounded-pill px-3">Enviar solicitação</button>
+                                    {% endif %}
+                                </div>
+                                <div class="p-1">
+                                    <strong class="mb-1">{{ user_search_result.username }}</strong>
+                                </div>
+                                <div class="p-1">
+                                    <small>{{ user_search_result.email }}</small>
+                                </div>
+                                <div class="p-1">
+                                    <button type="submit" class="btn btn-success rounded-pill px-3">Enviar solicitação</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
         {% endif %}
-        <br>
         <br>
 
         <div>   

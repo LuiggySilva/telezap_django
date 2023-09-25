@@ -18,7 +18,7 @@ class Notification(models.Model):
     status = models.CharField(max_length=1, choices=status_choices, default=status_choices[0], verbose_name='Status')
 
     def __str__(self):
-        return f"{self.author} -> {self.receiver}"
+        return f"{self.author.email} -> {self.receiver.email}"
 
     def is_author(self, user):
         return self.author == user

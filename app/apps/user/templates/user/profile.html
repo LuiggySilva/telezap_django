@@ -6,6 +6,9 @@
 {% block head %}
     <link rel="stylesheet" href="{% static 'registration/css/registration.css' %}">
     <link rel="stylesheet" href="{% static 'user/css/profile.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.min.js"></script>
+
     <script src="{% static 'user/js/profile.js' %}" defer></script>
 {% endblock head %}
 
@@ -31,24 +34,9 @@
                                     <img id="profile-photo" src="{{ field.value.url }}" alt="{{ field.value.name }}">
                                 </div>
                                 <div class="">
-                                    <div class="input-group-prepend text-center">
-                                        <label id="photo-label" class="btn btn-outline-primary me-2" for="id_photo">Alterar foto</label>
-                                        <input type="file" name="photo" accept="image/*" id="id_photo" class="form-control">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-center py-1">
+                                        <button type="button" id="cropButton" style="display: none;" class="btn btn-outline-secondary"><i id="loading-image" style="display: none;" class="fas fa-spinner fa-spin"></i> Cortar foto</button>
                                     </div>
-                                    <div id="photo-checkbox">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="photo-clear" id="photo-clear_id">
-                                            <label class="form-check-label" for="photo-clear_id">Remover foto</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="mb-4">
-                                <div class="photo-preview-container">
-                                    <img id="profile-photo" src="{% static 'base/img/profile-photo.jpg' %}" alt="Sem foto de perfil">
-                                </div>
-                                <div class="">
                                     <div class="input-group-prepend text-center">
                                         <label id="photo-label" class="btn btn-outline-primary me-2" for="id_photo">Alterar foto</label>
                                         <input type="file" name="photo" accept="image/*" id="id_photo" class="form-control">
@@ -73,24 +61,7 @@
                             </div>
                             <div class="collapse" id="emojis">
                                 <div class="card card-body mt-1">
-                                    <ul class="nav nav-tabs justify-content-center nav-emojis" id="myTab" role="tablist">
-                                        {% for categoria, data in emojis_.items %}
-                                            <li class="nav-item" role="presentation">
-                                                <a title={{data.name}} class="emoji-nav-link nav-link{% if forloop.first %} active{% endif %}" id="{{ categoria|slugify }}-tab" data-bs-toggle="tab" href="#{{ categoria|slugify }}" role="tab" aria-controls="{{ categoria|slugify }}" aria-selected="{{ forloop.first }}">{{ data.icon|safe }}</a>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                    <div class="tab-content mt-2" id="myTabContent">
-                                        {% for categoria, data in emojis.items %}
-                                            <div class="tab-pane fade{% if forloop.first %} show active{% endif %}" id="{{ categoria|slugify }}" role="tabpanel" aria-labelledby="{{ categoria|slugify }}-tab">
-                                                <div class="emoji-list">
-                                                    {% for emoji in data.emojis %}
-                                                        <span class="emoji-icon">{{ emoji|safe }}</span>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
+                                    {% include 'emojis.html' with emojis=emojis %}
                                 </div>
                             </div>
                         </div>
